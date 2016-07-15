@@ -57,7 +57,6 @@ public class GUI extends Application {
             rootLayout.setCenter(inputViewer);
             controller = loader.getController();
             controller.stage = primaryStage;
-            controller.refreshVideoInputDevices();
         } catch (IOException e) {
             e.printStackTrace();
         }

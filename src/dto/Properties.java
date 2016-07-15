@@ -4,8 +4,10 @@ public class Properties {
 
     public static volatile boolean run = true;
 
-    public static int IMAGE_WIDTH = 640;
-    public static int IMAGE_HEIGHT = 480;
+    public static int DS_IMAGE_WIDTH = 640;
+    public static int DS_IMAGE_HEIGHT = 480;
+    public static int IMAGE_WIDTH = 1280;
+    public static int IMAGE_HEIGHT = 960;
 
     public static int IMAGE_BUFFER_SIZE = 120;
 
