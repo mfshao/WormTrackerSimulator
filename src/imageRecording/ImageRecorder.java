@@ -19,12 +19,10 @@ public class ImageRecorder implements Runnable {
     private final Thread thread;
     private final String outputDirectory;
     private boolean run = true;
-    private boolean isLogging = true;
 
-    public ImageRecorder(ImageProducer imageProducer, String destination, boolean log) {
+    public ImageRecorder(ImageProducer imageProducer, String destination) {
         this.imageProducer = imageProducer;
         outputDirectory = destination;
-        isLogging = log;
         thread = new Thread(this, "Image Recorder");
     }
 

@@ -1,5 +1,6 @@
 package imageAqcuisition.imageInputSource;
 
+import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.File;
 import java.io.FilenameFilter;
@@ -20,6 +21,7 @@ public class ImageSequence implements ImageInputSource {
     int seek;
     String filePath;
     boolean fancy = false;
+    boolean ready = true;
     long timeReady = System.currentTimeMillis();
     int framesPerSecond = 30;
 
@@ -29,7 +31,7 @@ public class ImageSequence implements ImageInputSource {
      * @param path The directory in which the image files are.
      */
     public ImageSequence(String path) {
-        filePath = path+"\\";
+        filePath = path + "\\";
     }
 
     /**
@@ -48,6 +50,7 @@ public class ImageSequence implements ImageInputSource {
         });
     }
 
+
     @Override
     public ByteBuffer getImage() {
         try {
@@ -61,7 +64,7 @@ public class ImageSequence implements ImageInputSource {
             }
             return ByteBuffer.wrap(imgBytes);
         } catch (IOException e) {
-            e.printStackTrace();
+            ready = false;
         }
 
         //If the image fails to read or cast
@@ -75,7 +78,7 @@ public class ImageSequence implements ImageInputSource {
 			return new File(filePath + String.format("%06d", seek++) + ".jpeg").exists();
 		}
 		return false;*/
-        return true;
+        return ready;
     }
 
 }

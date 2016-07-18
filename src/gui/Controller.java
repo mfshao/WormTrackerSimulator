@@ -15,11 +15,14 @@ import imageRecording.ImageRecorder;
 import java.io.File;
 import java.nio.ByteBuffer;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.image.Image;
@@ -41,6 +44,8 @@ public class Controller extends VBox {
     private String inputLocation;
     private String outputLocation;
     private String imageLocation;
+    private File inputDirectory;
+    private File outputDirectory;
     private boolean tracking = false;
     private boolean recording = false;
 
@@ -57,12 +62,6 @@ public class Controller extends VBox {
     @FXML
     private Button endSimBtn;
     @FXML
-    private Button inputBrowseBtn;
-    @FXML
-    private Button outputBrowseBtn;
-    @FXML
-    private Button imgBrowseBtn;
-    @FXML
     private TextField inputLocBox;
     @FXML
     private TextField outputLocBox;
@@ -72,6 +71,8 @@ public class Controller extends VBox {
     private Accordion accordion;
     @FXML
     private TitledPane resizePane;
+    @FXML
+    private TextArea statusBox;
 
     public void updateImageView(ByteBuffer b) {
         Image img = ImageTools.toJavaFXImage(b); //Oh goodness...
@@ -150,18 +151,23 @@ public class Controller extends VBox {
 //            dto.Properties.MOTOR_PX_PER_STEP_Y = (double) (dto.Properties.DS_IMAGE_HEIGHT * dto.Properties.MOTOR_PX_PER_STEP_Y) / 480;
 //            dto.Properties.MOVE_DECISION_CONFIDENCE_DISTANCE = (double) (dto.Properties.DS_IMAGE_HEIGHT * dto.Properties.DS_IMAGE_WIDTH * dto.Properties.MOVE_DECISION_CONFIDENCE_DISTANCE) / (640 * 480);
 //            dto.Properties.MOVE_DECISION_BOUNDARY_PX = (int) (DS_IMAGE_WIDTH * MOVE_DECISION_BOUNDARY_RATIO);
-            ImageInputSource imageSource = new ImageSequence(inputLocation);
-            imageProducer = new ImageProducer(imageSource);
-            imageProducer.start();
-            downSampler = new DownSampler(imageProducer);
-            downSampler.start();
-            dto.Properties.run = true;
             if (inputLocation == null || outputLocation == null) {
                 showWarning("No input/output location specified", "Please choose an input location and an output location first.");
                 return;
             }
-            imageRecorder = new ImageRecorder(imageProducer, outputLocation, false);
-            imageRecorder.start();
+            try {
+                inputDirectory = new File(inputLocation);
+                outputDirectory = new File(outputLocation);
+                downSampler = new DownSampler(inputDirectory, outputDirectory, statusBox);
+                downSampler.start();
+            } catch (Exception ex) {
+                showExceptionError(ex, "FileIOException", "Cannot open File path!");
+            }
+            statusBox.setVisible(true);
+            imageView.setVisible(false);
+//            imageRecorder = new ImageRecorder(imageProducer, outputLocation);
+//            imageRecorder.start();
+            dto.Properties.run = true;
         } catch (NullPointerException e) {
             showExceptionError(e, "NullPointerException", "Please select a resolution first!");
         }
@@ -227,6 +233,12 @@ public class Controller extends VBox {
 
     public void initialize() {
         accordion.setExpandedPane(resizePane);
+        statusBox.textProperty().addListener(new ChangeListener<Object>() {
+            @Override
+            public void changed(ObservableValue<? extends Object> observable, Object oldValue, Object newValue) {
+                statusBox.setScrollTop(Double.MAX_VALUE);
+            }
+        });
     }
 
     public static class InputViewFeed implements Runnable {

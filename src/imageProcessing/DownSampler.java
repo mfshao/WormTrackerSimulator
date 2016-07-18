@@ -23,23 +23,34 @@ import imageAcquisition.ImageProducer;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.Image;
+import java.io.File;
+import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.scene.control.TextArea;
+import javax.imageio.ImageIO;
 
 /**
  *
  * @author Travis Shao
  */
-public class DownSampler implements Runnable {
+public final class DownSampler implements Runnable {
 
-    private final ImageProducer input;
-    private final long referenceTime = 0;
     private BufferedImage resizedImage;
+    private final File inputDirectory;
+    private final File outputDirectory;
     private final Thread thread;
+    private final TextArea textArea;
+    private final int totalFrame;
     public boolean run = true;
-    private int i = 0;
+    private int frame = 0;
 
-    public DownSampler(ImageProducer in) {
-        input = in;
+    public DownSampler(File inputDirectory, File outputDirectory, TextArea textArea) {
+        this.inputDirectory = inputDirectory;
+        this.outputDirectory = outputDirectory;
+        this.textArea = textArea;
+        this.totalFrame = this.getImageCount(inputDirectory);
         thread = new Thread(this);
     }
 
@@ -49,46 +60,42 @@ public class DownSampler implements Runnable {
     }
 
     public void stop() {
-        i = 0;
+        frame = 0;
         run = false;
+    }
+
+    public int getImageCount(File inputDirectory) {
+        int count = 0;
+        for (File f : inputDirectory.listFiles()) {
+            if (f.isFile() && (f.getName().endsWith(".jpeg"))) {
+                count++;
+            }
+        }
+        return count;
     }
 
     @Override
     public void run() {
-        while (run) {
+        while (frame <= totalFrame) {
             try {
-                if (System.currentTimeMillis() - referenceTime > SEGMENTATION_DELAY) {
-                    ImageTools.ImageEntry entry = input.peek();
-                    if (entry == null) {
-                        // Thread just started, no images to peek! Wait a bit.
-                        Thread.sleep(500);
-                        continue;
-                    }
-                    byte[] wrap;
-                    BufferedImage referenceImage;
-
-                    synchronized (entry) {
-                        ByteBuffer img = entry.img;
-                        wrap = new byte[img.remaining()];
-                        img.get(wrap);
-                        img.rewind();
-
-                        referenceImage = ImageTools.toBufferedImage(img);
-                    }
-                    Image toolkitImage = referenceImage.getScaledInstance(DS_IMAGE_WIDTH, DS_IMAGE_HEIGHT, Image.SCALE_AREA_AVERAGING);
-                    resizedImage = new BufferedImage(DS_IMAGE_WIDTH, DS_IMAGE_HEIGHT, BufferedImage.TYPE_BYTE_GRAY);
-                    Graphics g = resizedImage.getGraphics();
-                    g.drawImage(toolkitImage, 0, 0, null);
-                    g.dispose();
-                    System.out.println(i);
-                    i++;
-                } else {
-                    Thread.sleep(10);
+                BufferedImage img = ImageIO.read(new File(inputDirectory + "\\" + String.format("%07d", frame++) + ".jpeg"));
+                Image toolkitImage = img.getScaledInstance(DS_IMAGE_WIDTH, DS_IMAGE_HEIGHT, Image.SCALE_AREA_AVERAGING);
+                resizedImage = new BufferedImage(DS_IMAGE_WIDTH, DS_IMAGE_HEIGHT, BufferedImage.TYPE_BYTE_GRAY);
+                Graphics g = resizedImage.getGraphics();
+                g.drawImage(toolkitImage, 0, 0, null);
+                g.dispose();
+                try {
+                    ImageIO.write(resizedImage, "jpeg", new File(outputDirectory + "\\" + String.format("%07d", frame) + ".jpeg"));
+                } catch (IOException e) {
+                } finally {
+                    textArea.appendText(outputDirectory + "\\" + String.format("%07d", frame) + ".jpeg");
+                    textArea.appendText("\n");
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (IOException ex) {
             }
         }
+        textArea.appendText("Done!");
+        textArea.appendText("\n");
+        this.stop();
     }
-
 }
