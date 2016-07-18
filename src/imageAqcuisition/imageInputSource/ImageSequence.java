@@ -29,7 +29,7 @@ public class ImageSequence implements ImageInputSource {
      * @param path The directory in which the image files are.
      */
     public ImageSequence(String path) {
-        filePath = path;
+        filePath = path+"\\";
     }
 
     /**
@@ -56,7 +56,8 @@ public class ImageSequence implements ImageInputSource {
             if (fancy) {
                 imgBytes = ((DataBufferByte) (ImageIO.read(files[seek++]).getRaster().getDataBuffer())).getData();
             } else {
-                imgBytes = ((DataBufferByte) (ImageIO.read(new File(filePath + String.format("%07d", seek++) + ".jpg")).getRaster().getDataBuffer())).getData();
+                System.out.println(filePath + String.format("%07d", seek++) + ".jpeg");
+                imgBytes = ((DataBufferByte) (ImageIO.read(new File(filePath + String.format("%07d", seek++) + ".jpeg")).getRaster().getDataBuffer())).getData();
             }
             return ByteBuffer.wrap(imgBytes);
         } catch (IOException e) {

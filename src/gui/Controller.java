@@ -7,6 +7,7 @@ import static gui.GUI.showWarning;
 import imageAcquisition.ImageProducer;
 import imageAqcuisition.imageInputSource.ImageInputSource;
 import imageAqcuisition.imageInputSource.ImageSequence;
+import imageProcessing.DownSampler;
 import imageProcessing.ImageProcessor;
 import imageProcessing.ImageTools;
 import imageProcessing.ImageTools.ImageEntry;
@@ -16,9 +17,11 @@ import java.nio.ByteBuffer;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -33,6 +36,7 @@ public class Controller extends VBox {
     private ImageProcessor imageProcessor;
     private InputViewFeed inputViewFeed;
     private ImageRecorder imageRecorder;
+    private DownSampler downSampler;
     public Stage stage;
     private String inputLocation;
     private String outputLocation;
@@ -64,6 +68,10 @@ public class Controller extends VBox {
     private TextField outputLocBox;
     @FXML
     private TextField imageSeqLocBox;
+    @FXML
+    private Accordion accordion;
+    @FXML
+    private TitledPane resizePane;
 
     public void updateImageView(ByteBuffer b) {
         Image img = ImageTools.toJavaFXImage(b); //Oh goodness...
@@ -98,7 +106,7 @@ public class Controller extends VBox {
                     break;
             }
         } catch (NullPointerException ex) {
-
+            ex.printStackTrace();
         }
     }
 
@@ -145,11 +153,15 @@ public class Controller extends VBox {
             ImageInputSource imageSource = new ImageSequence(inputLocation);
             imageProducer = new ImageProducer(imageSource);
             imageProducer.start();
-            imageProcessor = new ImageProcessor(imageProducer);
-            imageProcessor.start();
-            inputViewFeed = new InputViewFeed(imageProducer, this);
-            inputViewFeed.start();
+            downSampler = new DownSampler(imageProducer);
+            downSampler.start();
             dto.Properties.run = true;
+            if (inputLocation == null || outputLocation == null) {
+                showWarning("No input/output location specified", "Please choose an input location and an output location first.");
+                return;
+            }
+            imageRecorder = new ImageRecorder(imageProducer, outputLocation, false);
+            imageRecorder.start();
         } catch (NullPointerException e) {
             showExceptionError(e, "NullPointerException", "Please select a resolution first!");
         }
@@ -179,20 +191,17 @@ public class Controller extends VBox {
     protected void recording() {
         if (recording) {
             imageRecorder.stop();
-        } else {
-            if (imageProducer == null) {
-                showWarning("No devices connected", "Please connect a camera and motor control device before continuing.");
-                return;
-            }
-//            if (recordingLocation == null) {
-//                showWarning("No recording location specified", "Please set a save location for the recording file, under the 'Options' tab.");
-//                return;
-//            }
-//            imageRecorder = new ImageRecorder(imageProducer, recordingLocation);
-//            imageRecorder.start();
-//            recordingLocation = null;
-//            imageView.setImage(null);
-        }
+        } else if (imageProducer == null) {
+            showWarning("No devices connected", "Please connect a camera and motor control device before continuing.");
+            return;
+        } //            if (recordingLocation == null) {
+        //                showWarning("No recording location specified", "Please set a save location for the recording file, under the 'Options' tab.");
+        //                return;
+        //            }
+        //            imageRecorder = new ImageRecorder(imageProducer, recordingLocation);
+        //            imageRecorder.start();
+        //            recordingLocation = null;
+        //            imageView.setImage(null);
         recording = !recording;
     }
 
@@ -214,6 +223,10 @@ public class Controller extends VBox {
                 dto.Properties.run = false;
             }
         });
+    }
+
+    public void initialize() {
+        accordion.setExpandedPane(resizePane);
     }
 
     public static class InputViewFeed implements Runnable {

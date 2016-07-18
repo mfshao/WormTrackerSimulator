@@ -17,13 +17,21 @@
         <!--AnchorPane fx:id = "controlPane" minHeight="0.0" minWidth="0.0" prefHeight="768.0" prefWidth="202.0"-->
         <Accordion fx:id="accordion" layoutX="1024.0" minHeight="480.0" minWidth="200.0" prefHeight="768.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <panes>
-                <TitledPane fx:id="devicePane" animated="false" prefHeight="288.0" prefWidth="202.0" text="Resize">
+                <TitledPane fx:id="resizePane" animated="false" prefHeight="288.0" prefWidth="202.0" text="Resize">
                     <content>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="150.0" prefWidth="200.0">
                             <children>
                                 <Label layoutX="18.0" layoutY="4.0" text="Input Location" />
                                 <Label layoutX="15.0" layoutY="87.0" text="Input Resolution" />
-                                <ChoiceBox id="inputResSelector" fx:id="inputResSelector" layoutX="14.0" layoutY="105.0" prefHeight="25.0" prefWidth="165.0" />
+                                <ChoiceBox id="inputResSelector" fx:id="inputResSelector" layoutX="14.0" layoutY="105.0" prefHeight="25.0" prefWidth="165.0" >
+                                    <items>
+                                        <FXCollections fx:factory="observableArrayList">
+                                            <String fx:value="640*480" />
+                                            <String fx:value="1280*720" />
+                                            <String fx:value="1280*960" />
+                                        </FXCollections>
+                                    </items>
+                                </ChoiceBox>
                                 <Label layoutX="13.0" layoutY="148.0" text="Output Location" />
                                 <Button id="startResizeBtn" fx:id="startResizeBtn" layoutX="76.0" layoutY="337.0" mnemonicParsing="false" onMouseClicked="#startResize" text="Start" />
                                 <TextField id="inputLocBox" fx:id="inputLocBox" editable="false" layoutX="16.0" layoutY="25.0" prefHeight="25.0" prefWidth="170.0" />
@@ -38,13 +46,13 @@
                                 </ChoiceBox>
                                 <Label layoutX="21.0" layoutY="234.0" text="Output Resolution" />
                                 <TextField id="outputLocBox" fx:id="outputLocBox" editable="false" layoutX="12.0" layoutY="172.0" prefHeight="25.0" prefWidth="170.0" />
-                                <Button id="inputBrowseBtn" fx:id="inputBrowseBtn" layoutX="107.0" layoutY="56.0" mnemonicParsing="false" onMouseClicked="#browseFileLocation" text="Browse..." />
-                                <Button id="outputBrowseBtn" fx:id="outputBrowseBtn" layoutX="103.0" layoutY="203.0" mnemonicParsing="false" onMouseClicked="#browseFileLocation" text="Browse..." />
+                                <Button id="inputBrowseBtn" fx:id="inputBrowseBtn" layoutX="107.0" layoutY="56.0" mnemonicParsing="false" onAction="#browseFileLocation" text="Browse..." />
+                                <Button id="outputBrowseBtn" fx:id="outputBrowseBtn" layoutX="103.0" layoutY="203.0" mnemonicParsing="false" onAction="#browseFileLocation" text="Browse..." />
                             </children>
                         </AnchorPane>
                     </content>
                 </TitledPane>
-                <TitledPane animated="false" prefHeight="339.0" prefWidth="202.0" text="Simulate">
+                <TitledPane fx:id="simulatePane" animated="false" prefHeight="339.0" prefWidth="202.0" text="Simulate">
                     <content>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                             <children>

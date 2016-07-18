@@ -57,6 +57,7 @@ public class GUI extends Application {
             rootLayout.setCenter(inputViewer);
             controller = loader.getController();
             controller.stage = primaryStage;
+            controller.initialize();
         } catch (IOException e) {
             e.printStackTrace();
         }

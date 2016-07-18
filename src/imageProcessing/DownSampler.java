@@ -18,10 +18,11 @@ package imageProcessing;
 
 import static dto.Properties.DS_IMAGE_HEIGHT;
 import static dto.Properties.DS_IMAGE_WIDTH;
-import static dto.Properties.IMAGE_HEIGHT;
-import static dto.Properties.IMAGE_WIDTH;
 import static dto.Properties.SEGMENTATION_DELAY;
 import imageAcquisition.ImageProducer;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.awt.Image;
 import java.nio.ByteBuffer;
 
 /**
@@ -32,9 +33,10 @@ public class DownSampler implements Runnable {
 
     private final ImageProducer input;
     private final long referenceTime = 0;
-    private int[][] resizedImage;
+    private BufferedImage resizedImage;
     private final Thread thread;
     public boolean run = true;
+    private int i = 0;
 
     public DownSampler(ImageProducer in) {
         input = in;
@@ -47,43 +49,8 @@ public class DownSampler implements Runnable {
     }
 
     public void stop() {
+        i = 0;
         run = false;
-    }
-
-    private static int[][] getImage(byte[] src) {
-
-        int[] gray = new int[src.length / 3];
-        for (int i = 0; i < src.length; i += 3) {
-            int r = src[i];
-            int g = src[i + 1];
-            int b = src[i + 2];
-            gray[i / 3] = (int) ((r + g + b) / 3);
-        }
-
-        int[][] image = new int[IMAGE_WIDTH][IMAGE_HEIGHT];
-        int k = 0;
-        for (int j = 0; j < IMAGE_HEIGHT; j++) {
-            for (int i = 0; i < IMAGE_WIDTH; i++) {
-                image[i][j] = src[k];
-                k++;
-            }
-        }
-        return image;
-    }
-
-    public int[][] resizePixels(int[][] pixels, int w1, int h1, int w2, int h2) {
-        int[][] temp = new int[w2][h2];
-        double x_ratio = w1 / (double) w2;
-        double y_ratio = h1 / (double) h2;
-        double px, py;
-        for (int i = 0; i < h2; i++) {
-            for (int j = 0; j < w2; j++) {
-                px = Math.floor(j * x_ratio);
-                py = Math.floor(i * y_ratio);
-                temp[j][i] = pixels[(int) px][(int) py];
-            }
-        }
-        return temp;
     }
 
     @Override
@@ -98,14 +65,23 @@ public class DownSampler implements Runnable {
                         continue;
                     }
                     byte[] wrap;
+                    BufferedImage referenceImage;
+
                     synchronized (entry) {
                         ByteBuffer img = entry.img;
                         wrap = new byte[img.remaining()];
                         img.get(wrap);
                         img.rewind();
+
+                        referenceImage = ImageTools.toBufferedImage(img);
                     }
-                    int[][] referenceImage = getImage(wrap);
-                    resizedImage = resizePixels(referenceImage, IMAGE_WIDTH, IMAGE_HEIGHT, DS_IMAGE_WIDTH, DS_IMAGE_HEIGHT);
+                    Image toolkitImage = referenceImage.getScaledInstance(DS_IMAGE_WIDTH, DS_IMAGE_HEIGHT, Image.SCALE_AREA_AVERAGING);
+                    resizedImage = new BufferedImage(DS_IMAGE_WIDTH, DS_IMAGE_HEIGHT, BufferedImage.TYPE_BYTE_GRAY);
+                    Graphics g = resizedImage.getGraphics();
+                    g.drawImage(toolkitImage, 0, 0, null);
+                    g.dispose();
+                    System.out.println(i);
+                    i++;
                 } else {
                     Thread.sleep(10);
                 }
