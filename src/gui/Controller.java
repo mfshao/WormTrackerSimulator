@@ -7,7 +7,6 @@ import static gui.GUI.showWarning;
 import imageAcquisition.ImageProducer;
 import imageAqcuisition.imageInputSource.ImageInputSource;
 import imageAqcuisition.imageInputSource.ImageSequence;
-import imageAqcuisition.imageInputSource.SerialCamera;
 import imageProcessing.ImageProcessor;
 import imageProcessing.ImageTools;
 import imageProcessing.ImageTools.ImageEntry;
@@ -17,25 +16,21 @@ import java.nio.ByteBuffer;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TitledPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
-import motorControl.MotorControl;
 
 public class Controller extends VBox {
 
     private int dragX, dragY;
     private ImageProducer imageProducer;
     private ImageProcessor imageProcessor;
-    private MotorControl motorControl;
     private InputViewFeed inputViewFeed;
     private ImageRecorder imageRecorder;
     public Stage stage;
@@ -141,16 +136,17 @@ public class Controller extends VBox {
                     break;
             }
 
-            dto.Properties.SEGMENTATION_WINDOW_SIZE = (int) Math.ceil((double) (dto.Properties.SEGMENTATION_WINDOW_SIZE * dto.Properties.DS_IMAGE_HEIGHT * dto.Properties.DS_IMAGE_WIDTH) / (640 * 480));
-            dto.Properties.SEGMENTATION_COMPONENT_MIN_SIZE = (int) Math.ceil((double) (dto.Properties.SEGMENTATION_COMPONENT_MIN_SIZE * dto.Properties.DS_IMAGE_HEIGHT * dto.Properties.DS_IMAGE_WIDTH) / (640 * 480));
-            dto.Properties.MOTOR_PX_PER_STEP_X = (double) (dto.Properties.DS_IMAGE_HEIGHT * dto.Properties.MOTOR_PX_PER_STEP_X) / 640;
-            dto.Properties.MOTOR_PX_PER_STEP_Y = (double) (dto.Properties.DS_IMAGE_HEIGHT * dto.Properties.MOTOR_PX_PER_STEP_Y) / 480;
-            dto.Properties.MOVE_DECISION_CONFIDENCE_DISTANCE = (double) (dto.Properties.DS_IMAGE_HEIGHT * dto.Properties.DS_IMAGE_WIDTH * dto.Properties.MOVE_DECISION_CONFIDENCE_DISTANCE) / (640 * 480);
-            dto.Properties.MOVE_DECISION_BOUNDARY_PX = (int) (DS_IMAGE_WIDTH * MOVE_DECISION_BOUNDARY_RATIO);
-            ImageInputSource imageSource = new ImageSequence("//medixsrv/Nematodes/data/N2_nf20/input/");
+//            dto.Properties.SEGMENTATION_WINDOW_SIZE = (int) Math.ceil((double) (dto.Properties.SEGMENTATION_WINDOW_SIZE * dto.Properties.DS_IMAGE_HEIGHT * dto.Properties.DS_IMAGE_WIDTH) / (640 * 480));
+//            dto.Properties.SEGMENTATION_COMPONENT_MIN_SIZE = (int) Math.ceil((double) (dto.Properties.SEGMENTATION_COMPONENT_MIN_SIZE * dto.Properties.DS_IMAGE_HEIGHT * dto.Properties.DS_IMAGE_WIDTH) / (640 * 480));
+//            dto.Properties.MOTOR_PX_PER_STEP_X = (double) (dto.Properties.DS_IMAGE_HEIGHT * dto.Properties.MOTOR_PX_PER_STEP_X) / 640;
+//            dto.Properties.MOTOR_PX_PER_STEP_Y = (double) (dto.Properties.DS_IMAGE_HEIGHT * dto.Properties.MOTOR_PX_PER_STEP_Y) / 480;
+//            dto.Properties.MOVE_DECISION_CONFIDENCE_DISTANCE = (double) (dto.Properties.DS_IMAGE_HEIGHT * dto.Properties.DS_IMAGE_WIDTH * dto.Properties.MOVE_DECISION_CONFIDENCE_DISTANCE) / (640 * 480);
+//            dto.Properties.MOVE_DECISION_BOUNDARY_PX = (int) (DS_IMAGE_WIDTH * MOVE_DECISION_BOUNDARY_RATIO);
+            ImageInputSource imageSource = new ImageSequence(inputLocation);
             imageProducer = new ImageProducer(imageSource);
-            motorControl = new MotorControl("");
             imageProducer.start();
+            imageProcessor = new ImageProcessor(imageProducer);
+            imageProcessor.start();
             inputViewFeed = new InputViewFeed(imageProducer, this);
             inputViewFeed.start();
             dto.Properties.run = true;
@@ -161,21 +157,21 @@ public class Controller extends VBox {
 
     @FXML
     protected void tracking() {
-        if (tracking) {
-            motorControl.stop();
-        } else {
-            if (imageProducer == null) {
-                showWarning("No devices connected", "Please connect a camera and motor control device before continuing.");
-                return;
-            }
-            if (imageProcessor == null) {
-                imageProcessor = new ImageProcessor(imageProducer);
-                motorControl.attach(imageProcessor);
-                imageProcessor.start();
-            }
-            motorControl.start();
-            inputViewFeed.attach(imageProcessor);
-        }
+//        if (tracking) {
+//            motorControl.stop();
+//        } else {
+//            if (imageProducer == null) {
+//                showWarning("No devices connected", "Please connect a camera and motor control device before continuing.");
+//                return;
+//            }
+//            if (imageProcessor == null) {
+//                imageProcessor = new ImageProcessor(imageProducer);
+//                motorControl.attach(imageProcessor);
+//                imageProcessor.start();
+//            }
+//            motorControl.start();
+//            inputViewFeed.attach(imageProcessor);
+//        }
         tracking = !tracking;
     }
 
@@ -201,30 +197,6 @@ public class Controller extends VBox {
     }
 
     @FXML
-    protected void dragPressed(MouseEvent event) {
-        dragX = (int) event.getX();
-        dragY = (int) event.getY();
-    }
-
-    @FXML
-    protected void dragReleased(MouseEvent event) {
-        if (motorControl == null) {
-            return;
-        }
-        int deltaX = (int) event.getX() - dragX;
-        int deltaY = (int) event.getY() - dragY;
-        //System.out.println(deltaX + "\t" + deltaY);
-
-        //Oh goodness...
-        (new Thread() {
-            @Override
-            public void run() {
-                motorControl.move(deltaX, deltaY);
-            }
-        }).start();
-    }
-
-    @FXML
     public void reset() {
         Platform.runLater(new Runnable() {
             @Override
@@ -237,9 +209,7 @@ public class Controller extends VBox {
                     imageProcessor.stop();
                     imageProcessor = null;
                 }
-                motorControl.stop();
-                motorControl.detach();
-                motorControl.closePort();
+//                motorControl.stop();
                 inputViewFeed.detach();
                 dto.Properties.run = false;
             }

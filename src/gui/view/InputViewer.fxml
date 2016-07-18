@@ -12,7 +12,7 @@
 <AnchorPane fx:id="bana" prefHeight="768.0" prefWidth="1224.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.Controller">
     <children>
         <AnchorPane prefHeight="768.0" prefWidth="1224.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-        <ImageView id="imageInput" fx:id="imageView" fitHeight="768.0" fitWidth="1024.0" onMousePressed="#dragPressed" onMouseReleased="#dragReleased" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
+        <ImageView id="imageInput" fx:id="imageView" fitHeight="768.0" fitWidth="1024.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
         <TextArea id="statusBox" fx:id="statusBox" prefHeight="768.0" prefWidth="1024.0" visible="false" wrapText="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
         <!--AnchorPane fx:id = "controlPane" minHeight="0.0" minWidth="0.0" prefHeight="768.0" prefWidth="202.0"-->
         <Accordion fx:id="accordion" layoutX="1024.0" minHeight="480.0" minWidth="200.0" prefHeight="768.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">

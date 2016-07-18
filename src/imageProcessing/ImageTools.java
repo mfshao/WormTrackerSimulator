@@ -16,7 +16,6 @@ import javafx.scene.image.Image;
 
 import javax.imageio.ImageIO;
 
-import motorControl.MotorControl;
 
 public class ImageTools {
 
