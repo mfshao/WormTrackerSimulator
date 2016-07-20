@@ -3,6 +3,7 @@ package imageProcessing;
 import static dto.Properties.IMAGE_HEIGHT;
 import static dto.Properties.IMAGE_WIDTH;
 import static gui.GUI.showExceptionError;
+import imageRecording.LogSimulator;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
@@ -15,6 +16,7 @@ import javafx.application.Platform;
 import javafx.scene.image.Image;
 
 import javax.imageio.ImageIO;
+import motorControl.MotorControlSimulator;
 
 
 public class ImageTools {
@@ -74,10 +76,10 @@ public class ImageTools {
         public ImageEntry(ByteBuffer image) {
             img = image;
             timeStamp = System.currentTimeMillis();
-     //       int[] centroid = MotorControl.getCentroid();
-        //    x = centroid[0];
-       //     y = centroid[1];
-        //    moving = MotorControl.isMoving();
+            int[] centroid = MotorControlSimulator.getCentroid();
+            x = centroid[0];
+            y = centroid[1];
+            moving = MotorControlSimulator.isMoving();
         }
 
         //Debug constructor

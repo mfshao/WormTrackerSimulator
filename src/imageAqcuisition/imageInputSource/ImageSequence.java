@@ -1,5 +1,6 @@
 package imageAqcuisition.imageInputSource;
 
+import static dto.Properties.IMAGE_EXTENSION;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.File;
@@ -23,7 +24,7 @@ public class ImageSequence implements ImageInputSource {
     boolean fancy = false;
     boolean ready = true;
     long timeReady = System.currentTimeMillis();
-    int framesPerSecond = 30;
+    int framesPerSecond = 9;
 
     /**
      * Default constructor. Appends expected file name to a file path
@@ -50,17 +51,16 @@ public class ImageSequence implements ImageInputSource {
         });
     }
 
-
     @Override
     public ByteBuffer getImage() {
         try {
             //Need to decode file format, then get BGR values as byte[]
             byte[] imgBytes;
             if (fancy) {
-                imgBytes = ((DataBufferByte) (ImageIO.read(files[seek++]).getRaster().getDataBuffer())).getData();
+                imgBytes = ((DataBufferByte) (ImageIO.read(files[seek]).getRaster().getDataBuffer())).getData();
             } else {
-                System.out.println(filePath + String.format("%07d", seek++) + ".jpeg");
-                imgBytes = ((DataBufferByte) (ImageIO.read(new File(filePath + String.format("%07d", seek++) + ".jpeg")).getRaster().getDataBuffer())).getData();
+                System.out.println(filePath + String.format("%07d", seek) + IMAGE_EXTENSION);
+                imgBytes = ((DataBufferByte) (ImageIO.read(new File(filePath + String.format("%07d", seek) + IMAGE_EXTENSION)).getRaster().getDataBuffer())).getData();
             }
             return ByteBuffer.wrap(imgBytes);
         } catch (IOException e) {
@@ -73,12 +73,10 @@ public class ImageSequence implements ImageInputSource {
 
     @Override
     public boolean isReady() {
-        /*
-		if (System.currentTimeMillis() - timeReady >= (1000 / framesPerSecond)) {
-			return new File(filePath + String.format("%06d", seek++) + ".jpeg").exists();
-		}
-		return false;*/
-        return ready;
+        if (System.currentTimeMillis() - timeReady >= (1000 / framesPerSecond)) {
+            return new File(filePath + String.format("%07d", seek++) + IMAGE_EXTENSION).exists();
+        }
+        return false;
     }
 
 }

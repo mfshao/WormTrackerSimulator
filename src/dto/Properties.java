@@ -37,6 +37,6 @@ public class Properties {
     public static double MOVE_DECISION_CONFIDENCE_DISTANCE = 25;
     public static int MOVE_DECISION_POST_DELAY = 1000;
     
-//    public static String IMAGE_EXTENSION = ".jpeg";
-    public static String IMAGE_EXTENSION = ".jpg";
+    public static String IMAGE_EXTENSION = ".jpeg";
+//    public static String IMAGE_EXTENSION = ".jpg";
 }

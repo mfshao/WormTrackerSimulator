@@ -1,29 +1,26 @@
 package imageRecording;
 
 import imageAcquisition.ImageProducer;
-import imageProcessing.ImageTools;
 import imageProcessing.ImageTools.ImageEntry;
 
-import java.awt.image.BufferedImage;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import javax.imageio.ImageIO;
 
-public class ImageRecorder implements Runnable {
+public class LogSimulator implements Runnable {
 
     private final ImageProducer imageProducer;
     private final Thread thread;
     private final String outputDirectory;
     private boolean run = true;
 
-    public ImageRecorder(ImageProducer imageProducer, String destination) {
+    public LogSimulator(ImageProducer imageProducer, String destination) {
         this.imageProducer = imageProducer;
         outputDirectory = destination;
-        thread = new Thread(this, "Image Recorder");
+        thread = new Thread(this, "Log Simulator");
     }
 
     public void start() {
@@ -51,12 +48,7 @@ public class ImageRecorder implements Runnable {
                             continue;
                         }
                         ImageEntry entry = imageProducer.get();
-                        BufferedImage img;
-                        synchronized (entry) {
-                            img = ImageTools.toBufferedImage(entry.img);
-                        }
                         try {
-                            ImageIO.write(img, "jpeg", new File(outputDirectory + "/" + String.format("%07d", frame) + ".jpeg"));
                             fw.write(String.format("%07d %d %d %d %d%n", frame, entry.timeStamp, entry.x, entry.y, entry.moving));
                             os.writeInt(frame);
                             os.writeLong(entry.timeStamp);

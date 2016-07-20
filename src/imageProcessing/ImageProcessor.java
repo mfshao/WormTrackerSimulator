@@ -435,7 +435,6 @@ public class ImageProcessor implements Runnable {
                             centroid[0] = IMAGE_WIDTH / 2;
                             centroid[1] = IMAGE_HEIGHT / 2;
                             isNew = true;
-                            GUI.getController().reset();
                             break;
                         }
                     } else {

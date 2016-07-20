@@ -3,11 +3,13 @@ package gui;
 import static gui.GUI.showExceptionError;
 import static gui.GUI.showWarning;
 import imageAcquisition.ImageProducer;
+import imageAqcuisition.imageInputSource.ImageSequence;
 import imageProcessing.DownSampler;
 import imageProcessing.ImageProcessor;
 import imageProcessing.ImageTools;
 import imageProcessing.ImageTools.ImageEntry;
-import imageRecording.ImageRecorder;
+import imageRecording.LogSimulator;
+import motorControl.MotorControlSimulator;
 import java.io.File;
 import java.nio.ByteBuffer;
 import javafx.application.Platform;
@@ -33,21 +35,24 @@ public class Controller extends VBox {
     private ImageProducer imageProducer;
     private ImageProcessor imageProcessor;
     private InputViewFeed inputViewFeed;
-    private ImageRecorder imageRecorder;
+    private LogSimulator logSimulator;
     private DownSampler downSampler;
+    private MotorControlSimulator motorControlSimulator;
     public Stage stage;
     private String inputLocation;
     private String outputLocation;
     private String imageLocation;
     private File inputDirectory;
     private File outputDirectory;
-    private boolean tracking = false;
-    private boolean recording = false;
+    private File imageDirectory;
+    private boolean simulating = false;
 
     @FXML
     private ChoiceBox inputResSelector;
     @FXML
     private ChoiceBox outputResSelector;
+    @FXML
+    private ChoiceBox imageResSelector;
     @FXML
     private ImageView imageView;
     @FXML
@@ -139,12 +144,6 @@ public class Controller extends VBox {
                     break;
             }
 
-//            dto.Properties.SEGMENTATION_WINDOW_SIZE = (int) Math.ceil((double) (dto.Properties.SEGMENTATION_WINDOW_SIZE * dto.Properties.DS_IMAGE_HEIGHT * dto.Properties.DS_IMAGE_WIDTH) / (640 * 480));
-//            dto.Properties.SEGMENTATION_COMPONENT_MIN_SIZE = (int) Math.ceil((double) (dto.Properties.SEGMENTATION_COMPONENT_MIN_SIZE * dto.Properties.DS_IMAGE_HEIGHT * dto.Properties.DS_IMAGE_WIDTH) / (640 * 480));
-//            dto.Properties.MOTOR_PX_PER_STEP_X = (double) (dto.Properties.DS_IMAGE_HEIGHT * dto.Properties.MOTOR_PX_PER_STEP_X) / 640;
-//            dto.Properties.MOTOR_PX_PER_STEP_Y = (double) (dto.Properties.DS_IMAGE_HEIGHT * dto.Properties.MOTOR_PX_PER_STEP_Y) / 480;
-//            dto.Properties.MOVE_DECISION_CONFIDENCE_DISTANCE = (double) (dto.Properties.DS_IMAGE_HEIGHT * dto.Properties.DS_IMAGE_WIDTH * dto.Properties.MOVE_DECISION_CONFIDENCE_DISTANCE) / (640 * 480);
-//            dto.Properties.MOVE_DECISION_BOUNDARY_PX = (int) (DS_IMAGE_WIDTH * MOVE_DECISION_BOUNDARY_RATIO);
             if (inputLocation == null || outputLocation == null) {
                 showWarning("No input/output location specified", "Please choose an input location and an output location first.");
                 return;
@@ -160,8 +159,6 @@ public class Controller extends VBox {
             }
             statusBox.setVisible(true);
             imageView.setVisible(false);
-//            imageRecorder = new ImageRecorder(imageProducer, outputLocation);
-//            imageRecorder.start();
             dto.Properties.run = true;
         } catch (NullPointerException e) {
             showExceptionError(e, "NullPointerException", "Please select a resolution first!");
@@ -169,59 +166,88 @@ public class Controller extends VBox {
     }
 
     @FXML
-    protected void tracking() {
-//        if (tracking) {
-//            motorControl.stop();
-//        } else {
-//            if (imageProducer == null) {
-//                showWarning("No devices connected", "Please connect a camera and motor control device before continuing.");
-//                return;
-//            }
-//            if (imageProcessor == null) {
-//                imageProcessor = new ImageProcessor(imageProducer);
-//                motorControl.attach(imageProcessor);
-//                imageProcessor.start();
-//            }
-//            motorControl.start();
-//            inputViewFeed.attach(imageProcessor);
-//        }
-        tracking = !tracking;
+    protected void startSimulation() {
+        if (simulating) {
+            motorControlSimulator.stop();
+            logSimulator.stop();
+        } else {
+            if (imageLocation == null) {
+                showWarning("No image location specified", "Please choose an image location first.");
+                return;
+            }
+            try {
+                String imageResolution = (String) imageResSelector.getSelectionModel().getSelectedItem();
+                switch (imageResolution) {
+                    case "640*480":
+                        dto.Properties.IMAGE_HEIGHT = 480;
+                        dto.Properties.IMAGE_WIDTH = 640;
+                        break;
+                    case "1280*720":
+                        dto.Properties.IMAGE_HEIGHT = 720;
+                        dto.Properties.IMAGE_WIDTH = 1280;
+                        break;
+                    case "1280*960":
+                        dto.Properties.IMAGE_HEIGHT = 960;
+                        dto.Properties.IMAGE_WIDTH = 1280;
+                        break;
+                }
+
+                dto.Properties.SEGMENTATION_WINDOW_SIZE = (int) Math.ceil((double) (dto.Properties.SEGMENTATION_WINDOW_SIZE * dto.Properties.IMAGE_HEIGHT * dto.Properties.IMAGE_WIDTH) / (640 * 480));
+                dto.Properties.SEGMENTATION_COMPONENT_MIN_SIZE = (int) Math.ceil((double) (dto.Properties.SEGMENTATION_COMPONENT_MIN_SIZE * dto.Properties.IMAGE_HEIGHT * dto.Properties.IMAGE_WIDTH) / (640 * 480));
+                dto.Properties.MOTOR_PX_PER_STEP_X = (double) (dto.Properties.IMAGE_HEIGHT * dto.Properties.MOTOR_PX_PER_STEP_X) / 640;
+                dto.Properties.MOTOR_PX_PER_STEP_Y = (double) (dto.Properties.DS_IMAGE_HEIGHT * dto.Properties.MOTOR_PX_PER_STEP_Y) / 480;
+                dto.Properties.MOVE_DECISION_CONFIDENCE_DISTANCE = (double) (dto.Properties.IMAGE_HEIGHT * dto.Properties.IMAGE_WIDTH * dto.Properties.MOVE_DECISION_CONFIDENCE_DISTANCE) / (640 * 480);
+                dto.Properties.MOVE_DECISION_BOUNDARY_PX = (int) (dto.Properties.IMAGE_WIDTH * dto.Properties.MOVE_DECISION_BOUNDARY_RATIO);
+            } catch (NullPointerException e) {
+                showExceptionError(e, "NullPointerException", "Please select a resolution first!");
+            }
+            try {
+                imageProducer = new ImageProducer(new ImageSequence(imageLocation));
+                if (imageProducer == null) {
+                    showWarning("Input folder unreadable", "Input folder unreadable.");
+                    return;
+                }
+                motorControlSimulator = new MotorControlSimulator();
+                imageProducer.start();
+                if (imageProcessor == null) {
+                    imageProcessor = new ImageProcessor(imageProducer);
+                    motorControlSimulator.attach(imageProcessor);
+                    imageProcessor.start();
+                }
+                motorControlSimulator.start();
+                inputViewFeed = new InputViewFeed(imageProducer, this);
+                inputViewFeed.start();
+                inputViewFeed.attach(imageProcessor);
+                logSimulator = new LogSimulator(imageProducer, imageLocation);
+                logSimulator.start();
+
+                imageView.setVisible(true);
+                statusBox.setVisible(false);
+                startSimBtn.setDisable(true);
+                endSimBtn.setDisable(false);
+                simulating = !simulating;
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                showExceptionError(ex, "FileIOException", "Cannot open File path!");
+
+            }
+        }
     }
 
     @FXML
-    protected void recording() {
-        if (recording) {
-            imageRecorder.stop();
-        } else if (imageProducer == null) {
-            showWarning("No devices connected", "Please connect a camera and motor control device before continuing.");
-            return;
-        } //            if (recordingLocation == null) {
-        //                showWarning("No recording location specified", "Please set a save location for the recording file, under the 'Options' tab.");
-        //                return;
-        //            }
-        //            imageRecorder = new ImageRecorder(imageProducer, recordingLocation);
-        //            imageRecorder.start();
-        //            recordingLocation = null;
-        //            imageView.setImage(null);
-        recording = !recording;
-    }
-
-    @FXML
-    public void reset() {
+    public void endSimulation() {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                if (imageRecorder != null) {
-                    imageRecorder.stop();
-                    imageRecorder = null;
-                }
                 if (imageProcessor != null) {
                     imageProcessor.stop();
                     imageProcessor = null;
                 }
-//                motorControl.stop();
+                motorControlSimulator.stop();
                 inputViewFeed.detach();
                 dto.Properties.run = false;
+                startSimBtn.setDisable(true);
+                endSimBtn.setDisable(false);
             }
         });
     }
@@ -234,6 +260,7 @@ public class Controller extends VBox {
                 statusBox.setScrollTop(Double.MAX_VALUE);
             }
         });
+
     }
 
     public static class InputViewFeed implements Runnable {
