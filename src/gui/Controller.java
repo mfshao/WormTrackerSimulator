@@ -1,12 +1,8 @@
 package gui;
 
-import static dto.Properties.DS_IMAGE_WIDTH;
-import static dto.Properties.MOVE_DECISION_BOUNDARY_RATIO;
 import static gui.GUI.showExceptionError;
 import static gui.GUI.showWarning;
 import imageAcquisition.ImageProducer;
-import imageAqcuisition.imageInputSource.ImageInputSource;
-import imageAqcuisition.imageInputSource.ImageSequence;
 import imageProcessing.DownSampler;
 import imageProcessing.ImageProcessor;
 import imageProcessing.ImageTools;
@@ -27,7 +23,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
@@ -107,7 +102,6 @@ public class Controller extends VBox {
                     break;
             }
         } catch (NullPointerException ex) {
-            ex.printStackTrace();
         }
     }
 
@@ -158,8 +152,9 @@ public class Controller extends VBox {
             try {
                 inputDirectory = new File(inputLocation);
                 outputDirectory = new File(outputLocation);
-                downSampler = new DownSampler(inputDirectory, outputDirectory, statusBox);
+                downSampler = new DownSampler(inputDirectory, outputDirectory, statusBox, startResizeBtn);
                 downSampler.start();
+                startResizeBtn.setDisable(true);
             } catch (Exception ex) {
                 showExceptionError(ex, "FileIOException", "Cannot open File path!");
             }

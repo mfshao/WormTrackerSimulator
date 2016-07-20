@@ -18,6 +18,7 @@ package imageProcessing;
 
 import static dto.Properties.DS_IMAGE_HEIGHT;
 import static dto.Properties.DS_IMAGE_WIDTH;
+import static dto.Properties.IMAGE_EXTENSION;
 import static dto.Properties.SEGMENTATION_DELAY;
 import imageAcquisition.ImageProducer;
 import java.awt.Graphics;
@@ -28,6 +29,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javax.imageio.ImageIO;
 
@@ -42,15 +44,18 @@ public final class DownSampler implements Runnable {
     private final File outputDirectory;
     private final Thread thread;
     private final TextArea textArea;
+    private final Button resizeBtn;
     private final int totalFrame;
     public boolean run = true;
     private int frame = 0;
+    
 
-    public DownSampler(File inputDirectory, File outputDirectory, TextArea textArea) {
+    public DownSampler(File inputDirectory, File outputDirectory, TextArea textArea, Button btn) {
         this.inputDirectory = inputDirectory;
         this.outputDirectory = outputDirectory;
         this.textArea = textArea;
         this.totalFrame = this.getImageCount(inputDirectory);
+        resizeBtn = btn;
         thread = new Thread(this);
     }
 
@@ -67,7 +72,7 @@ public final class DownSampler implements Runnable {
     public int getImageCount(File inputDirectory) {
         int count = 0;
         for (File f : inputDirectory.listFiles()) {
-            if (f.isFile() && (f.getName().endsWith(".jpeg"))) {
+            if (f.isFile() && (f.getName().endsWith(IMAGE_EXTENSION))) {
                 count++;
             }
         }
@@ -76,26 +81,32 @@ public final class DownSampler implements Runnable {
 
     @Override
     public void run() {
-        while (frame <= totalFrame) {
+        textArea.appendText(Integer.toString(totalFrame));
+        textArea.appendText("\n");
+        while (run) {
+            if (frame >= totalFrame) {
+                run = false;
+            }
             try {
-                BufferedImage img = ImageIO.read(new File(inputDirectory + "\\" + String.format("%07d", frame++) + ".jpeg"));
+                BufferedImage img = ImageIO.read(new File(inputDirectory + "\\" + String.format("%07d", frame) + IMAGE_EXTENSION));
                 Image toolkitImage = img.getScaledInstance(DS_IMAGE_WIDTH, DS_IMAGE_HEIGHT, Image.SCALE_AREA_AVERAGING);
                 resizedImage = new BufferedImage(DS_IMAGE_WIDTH, DS_IMAGE_HEIGHT, BufferedImage.TYPE_BYTE_GRAY);
                 Graphics g = resizedImage.getGraphics();
                 g.drawImage(toolkitImage, 0, 0, null);
                 g.dispose();
                 try {
-                    ImageIO.write(resizedImage, "jpeg", new File(outputDirectory + "\\" + String.format("%07d", frame) + ".jpeg"));
+                    ImageIO.write(resizedImage, "jpeg", new File(outputDirectory + "\\" + String.format("%07d", frame++) + IMAGE_EXTENSION));
                 } catch (IOException e) {
                 } finally {
-                    textArea.appendText(outputDirectory + "\\" + String.format("%07d", frame) + ".jpeg");
-                    textArea.appendText("\n");
+//                    textArea.appendText(outputDirectory + "\\" + String.format("%07d", frame++) + IMAGE_EXTENSION);
+//                    textArea.appendText("\n");
                 }
             } catch (IOException ex) {
             }
         }
         textArea.appendText("Done!");
         textArea.appendText("\n");
+        resizeBtn.setDisable(false);
         this.stop();
     }
 }
