@@ -25,6 +25,7 @@ public class ImageSequence implements ImageInputSource {
     boolean ready = true;
     long timeReady = System.currentTimeMillis();
     int framesPerSecond = 9;
+    int totalFrame;
 
     /**
      * Default constructor. Appends expected file name to a file path
@@ -33,22 +34,18 @@ public class ImageSequence implements ImageInputSource {
      */
     public ImageSequence(String path) {
         filePath = path + "\\";
+        totalFrame = this.getImageCount();
     }
-
-    /**
-     * Fancy constructor.
-     *
-     * @param dir The directory to search for input files (only takes .jpeg,
-     * this can be changed)
-     */
-    public ImageSequence(File dir) {
-        fancy = true;
-        files = dir.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.toLowerCase().endsWith(".jpeg");
+    
+    public int getImageCount() {
+        int count = 0;
+        File files = new File(filePath);
+        for (File f : files.listFiles()) {
+            if (f.isFile() && (f.getName().endsWith(IMAGE_EXTENSION))) {
+                count++;
             }
-        });
+        }
+        return count;
     }
 
     @Override
@@ -73,7 +70,7 @@ public class ImageSequence implements ImageInputSource {
 
     @Override
     public boolean isReady() {
-        if (System.currentTimeMillis() - timeReady >= (1000 / framesPerSecond)) {
+        if (System.currentTimeMillis() - timeReady >= (1000 / framesPerSecond) && seek < totalFrame) {
             return new File(filePath + String.format("%07d", seek++) + IMAGE_EXTENSION).exists();
         }
         return false;

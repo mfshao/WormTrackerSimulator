@@ -13,9 +13,6 @@ import static dto.Properties.SEGMENTATION_DELAY;
 import static dto.Properties.SEGMENTATION_FAILURE_THRESHOLD;
 import imageProcessing.ImageProcessor;
 
-import jssc.SerialPort;
-import jssc.SerialPortException;
-
 /**
  * Motor Controller. Independently controls the motors to keep the target in
  * frame. Controls only 1 set of motors.
@@ -32,7 +29,6 @@ public class MotorControlSimulator implements Runnable {
 
     //private PrintWriter os;
     private volatile boolean run = true;
-    private SerialPort serialPort;
     private final Thread thread;
     private ImageProcessor imageProcessor;
     private long lastMove;
@@ -49,12 +45,6 @@ public class MotorControlSimulator implements Runnable {
         this.imageProcessor = null;
     }
     
-    public void closePort() {
-        try {
-            this.serialPort.closePort();
-        } catch (SerialPortException ex) {
-        }
-    }
 
     /**
      * Publically accessible move command, for use in UI (click drag)
@@ -81,11 +71,6 @@ public class MotorControlSimulator implements Runnable {
      * @param yStep Number of steps for motor 2 to move
      */
     private void move(int speed, int xStep, int yStep) {
-
-        //Send the command to the motors
-//        write(String.format("SM,%d,%d,%d", speed, xStep, yStep));
-
-        //Delay for the expected move time plus some padding just to be safe
         try {
             Thread.sleep((int) (MOTOR_MOVE_DELAY * 1.1));
         } catch (InterruptedException e) {
@@ -105,17 +90,6 @@ public class MotorControlSimulator implements Runnable {
         return moving;
     }
 
-    /**
-     * SHUT. DOWN. EVERYTHING! Or don't, because I haven't figured out how to
-     * cleanly stop all the threads...
-     */
-    private void close() {
-        try {
-            serialPort.closePort();
-        } catch (SerialPortException e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * Initializes the motor step mode, and flag us as moving until disable()
