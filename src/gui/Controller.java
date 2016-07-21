@@ -31,7 +31,6 @@ import javafx.stage.Stage;
 
 public class Controller extends VBox {
 
-    private int dragX, dragY;
     private ImageProducer imageProducer;
     private ImageProcessor imageProcessor;
     private InputViewFeed inputViewFeed;
@@ -194,8 +193,8 @@ public class Controller extends VBox {
 
                 dto.Properties.SEGMENTATION_WINDOW_SIZE = (int) Math.ceil((double) (dto.Properties.SEGMENTATION_WINDOW_SIZE * dto.Properties.IMAGE_HEIGHT * dto.Properties.IMAGE_WIDTH) / (640 * 480));
                 dto.Properties.SEGMENTATION_COMPONENT_MIN_SIZE = (int) Math.ceil((double) (dto.Properties.SEGMENTATION_COMPONENT_MIN_SIZE * dto.Properties.IMAGE_HEIGHT * dto.Properties.IMAGE_WIDTH) / (640 * 480));
-                dto.Properties.MOTOR_PX_PER_STEP_X = (double) (dto.Properties.IMAGE_HEIGHT * dto.Properties.MOTOR_PX_PER_STEP_X) / 640;
-                dto.Properties.MOTOR_PX_PER_STEP_Y = (double) (dto.Properties.DS_IMAGE_HEIGHT * dto.Properties.MOTOR_PX_PER_STEP_Y) / 480;
+                dto.Properties.MOTOR_PX_PER_STEP_X = (double) (dto.Properties.IMAGE_WIDTH * dto.Properties.MOTOR_PX_PER_STEP_X) / 640;
+                dto.Properties.MOTOR_PX_PER_STEP_Y = (double) (dto.Properties.IMAGE_HEIGHT * dto.Properties.MOTOR_PX_PER_STEP_Y) / 480;
                 dto.Properties.MOVE_DECISION_CONFIDENCE_DISTANCE = (double) (dto.Properties.IMAGE_HEIGHT * dto.Properties.IMAGE_WIDTH * dto.Properties.MOVE_DECISION_CONFIDENCE_DISTANCE) / (640 * 480);
                 dto.Properties.MOVE_DECISION_BOUNDARY_PX = (int) (dto.Properties.IMAGE_WIDTH * dto.Properties.MOVE_DECISION_BOUNDARY_RATIO);
             } catch (NullPointerException e) {
@@ -225,7 +224,7 @@ public class Controller extends VBox {
                 statusBox.setVisible(false);
                 startSimBtn.setDisable(true);
                 endSimBtn.setDisable(false);
-                simulating = !simulating;
+                simulating = true;
             } catch (Exception ex) {
                 ex.printStackTrace();
                 showExceptionError(ex, "FileIOException", "Cannot open File path!");
@@ -243,11 +242,22 @@ public class Controller extends VBox {
                     imageProcessor.stop();
                     imageProcessor = null;
                 }
+                if (logSimulator != null) {
+                    logSimulator.stop();;
+                    logSimulator = null;
+                }
+                if (imageProducer != null) {
+                    imageProducer.stop();;
+                    imageProducer = null;
+                }
                 motorControlSimulator.stop();
+                motorControlSimulator.detach();
                 inputViewFeed.detach();
+
                 dto.Properties.run = false;
-                startSimBtn.setDisable(true);
-                endSimBtn.setDisable(false);
+                simulating = false;
+                startSimBtn.setDisable(false);
+                endSimBtn.setDisable(true);
             }
         });
     }

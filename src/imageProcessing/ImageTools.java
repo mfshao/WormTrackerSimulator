@@ -76,7 +76,7 @@ public class ImageTools {
         public ImageEntry(ByteBuffer image) {
             img = image;
             timeStamp = System.currentTimeMillis();
-            int[] centroid = imageProcessor.getCentroid();
+            int[] centroid = MotorControlSimulator.getCentroid();
             x = centroid[0];
             y = centroid[1];
             moving = MotorControlSimulator.isMoving();

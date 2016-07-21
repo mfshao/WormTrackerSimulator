@@ -11,11 +11,11 @@ public class Properties {
 
     public static int IMAGE_BUFFER_SIZE = 120;
 
-    public static int SEGMENTATION_WINDOW_SIZE = 25;
+    public static int SEGMENTATION_WINDOW_SIZE = 50;
     public static int SEGMENTATION_COMPONENT_MIN_SIZE = 5;
     public static double SEGMENTATION_THRESHOLD = 0.80; //Magic number. Don't touch.
-    public static int SEGMENTATION_DELAY = 15;
-    public static int SEGMENTATION_FAILURE_THRESHOLD = 300000; //Time until we give up trying
+    public static int SEGMENTATION_DELAY = 333;
+    public static int SEGMENTATION_FAILURE_THRESHOLD = 30000; //Time until we give up trying
 
     /**
      * MOTOR_STEP_MODE controls what step mode the stepper motors will be
@@ -35,7 +35,7 @@ public class Properties {
     public static double MOVE_DECISION_BOUNDARY_RATIO = 0.15;
     public static int MOVE_DECISION_BOUNDARY_PX = (int) (IMAGE_WIDTH * MOVE_DECISION_BOUNDARY_RATIO);
     public static double MOVE_DECISION_CONFIDENCE_DISTANCE = 25;
-    public static int MOVE_DECISION_POST_DELAY = 1000;
+    public static int MOVE_DECISION_POST_DELAY = 500;
     
     public static String IMAGE_EXTENSION = ".jpeg";
 //    public static String IMAGE_EXTENSION = ".jpg";

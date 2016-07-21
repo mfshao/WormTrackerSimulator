@@ -36,7 +36,7 @@ public class ImageSequence implements ImageInputSource {
         filePath = path + "\\";
         totalFrame = this.getImageCount();
     }
-    
+
     public int getImageCount() {
         int count = 0;
         File files = new File(filePath);
@@ -56,7 +56,7 @@ public class ImageSequence implements ImageInputSource {
             if (fancy) {
                 imgBytes = ((DataBufferByte) (ImageIO.read(files[seek]).getRaster().getDataBuffer())).getData();
             } else {
-                System.out.println(filePath + String.format("%07d", seek) + IMAGE_EXTENSION);
+//                System.out.println(filePath + String.format("%07d", seek) + IMAGE_EXTENSION);
                 imgBytes = ((DataBufferByte) (ImageIO.read(new File(filePath + String.format("%07d", seek) + IMAGE_EXTENSION)).getRaster().getDataBuffer())).getData();
             }
             return ByteBuffer.wrap(imgBytes);
@@ -71,6 +71,7 @@ public class ImageSequence implements ImageInputSource {
     @Override
     public boolean isReady() {
         if (System.currentTimeMillis() - timeReady >= (1000 / framesPerSecond) && seek < totalFrame) {
+            timeReady = System.currentTimeMillis();
             return new File(filePath + String.format("%07d", seek++) + IMAGE_EXTENSION).exists();
         }
         return false;

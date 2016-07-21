@@ -19,16 +19,11 @@ package imageProcessing;
 import static dto.Properties.DS_IMAGE_HEIGHT;
 import static dto.Properties.DS_IMAGE_WIDTH;
 import static dto.Properties.IMAGE_EXTENSION;
-import static dto.Properties.SEGMENTATION_DELAY;
-import imageAcquisition.ImageProducer;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javax.imageio.ImageIO;
@@ -90,7 +85,7 @@ public final class DownSampler implements Runnable {
             try {
                 BufferedImage img = ImageIO.read(new File(inputDirectory + "\\" + String.format("%07d", frame) + IMAGE_EXTENSION));
                 Image toolkitImage = img.getScaledInstance(DS_IMAGE_WIDTH, DS_IMAGE_HEIGHT, Image.SCALE_AREA_AVERAGING);
-                resizedImage = new BufferedImage(DS_IMAGE_WIDTH, DS_IMAGE_HEIGHT, BufferedImage.TYPE_BYTE_GRAY);
+                resizedImage = new BufferedImage(DS_IMAGE_WIDTH, DS_IMAGE_HEIGHT, BufferedImage.TYPE_3BYTE_BGR);
                 Graphics g = resizedImage.getGraphics();
                 g.drawImage(toolkitImage, 0, 0, null);
                 g.dispose();

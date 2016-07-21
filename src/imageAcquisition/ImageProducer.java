@@ -59,12 +59,9 @@ public class ImageProducer implements Runnable {
      * @return Image at the top of the queue !!!WAITS FOR NEW IMAGE IF EMPTY!!!
      */
     public ImageEntry get() {
-        try {
-            return buffer.take();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return null;
+
+        return buffer.poll();
+
     }
 
     /**

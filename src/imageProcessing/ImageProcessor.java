@@ -257,9 +257,6 @@ public class ImageProcessor implements Runnable {
         } catch (SegmentationFailureException e) {
             return false;
         }
-        boolean realDistance = Math.abs(Math.sqrt(Math.pow(realCentroid[0]
-                - centroid[0], 2)
-                + Math.pow(realCentroid[1] - centroid[1], 2))) < MOVE_DECISION_CONFIDENCE_DISTANCE;
         boolean consecutiveDistance = Math.abs(Math.sqrt(Math.pow(
                 prevCentroid[0] - centroid[0], 2)
                 + Math.pow(prevCentroid[1] - centroid[1], 2))) < MOVE_DECISION_CONFIDENCE_DISTANCE;
