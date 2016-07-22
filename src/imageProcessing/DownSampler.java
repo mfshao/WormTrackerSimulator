@@ -39,18 +39,16 @@ public final class DownSampler implements Runnable {
     private final File outputDirectory;
     private final Thread thread;
     private final TextArea textArea;
-    private final Button resizeBtn;
     private final int totalFrame;
     public boolean run = true;
     private int frame = 0;
     
 
-    public DownSampler(File inputDirectory, File outputDirectory, TextArea textArea, Button btn) {
+    public DownSampler(File inputDirectory, File outputDirectory, TextArea textArea) {
         this.inputDirectory = inputDirectory;
         this.outputDirectory = outputDirectory;
         this.textArea = textArea;
         this.totalFrame = this.getImageCount(inputDirectory);
-        resizeBtn = btn;
         thread = new Thread(this);
     }
 
@@ -101,7 +99,6 @@ public final class DownSampler implements Runnable {
         }
         textArea.appendText("Done!");
         textArea.appendText("\n");
-        resizeBtn.setDisable(false);
         this.stop();
     }
 }

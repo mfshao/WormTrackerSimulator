@@ -82,7 +82,7 @@
                         </ChoiceBox>
                         <Label layoutX="17.0" layoutY="130.0" text="Image Resolution" />
                         <Label layoutX="17.0" layoutY="213.0" text="File Extension" />
-                        <ChoiceBox id="fileExtSelector" fx:id="fileExtSelector1" layoutX="17.0" layoutY="231.0" prefHeight="25.0" prefWidth="165.0">
+                        <ChoiceBox id="fileExtSelector1" fx:id="fileExtSelector1" layoutX="17.0" layoutY="231.0" prefHeight="25.0" prefWidth="165.0">
                            <items>
                               <FXCollections fx:factory="observableArrayList">
                                  <String fx:value=".jpg" />

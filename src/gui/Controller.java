@@ -165,7 +165,7 @@ public class Controller extends VBox {
             try {
                 inputDirectory = new File(inputLocation);
                 outputDirectory = new File(outputLocation);
-                downSampler = new DownSampler(inputDirectory, outputDirectory, statusBox, startResizeBtn);
+                downSampler = new DownSampler(inputDirectory, outputDirectory, statusBox);
                 downSampler.start();
                 startResizeBtn.setDisable(true);
                 resetResizeBtn.setDisable(false);
@@ -174,7 +174,6 @@ public class Controller extends VBox {
             }
             statusBox.setVisible(true);
             imageView.setVisible(false);
-            dto.Properties.run = true;
         } catch (NullPointerException e) {
             showExceptionError(e, "NullPointerException", "Please select a resolution first!");
         }
@@ -190,7 +189,6 @@ public class Controller extends VBox {
         outputDirectory = null;
         startResizeBtn.setDisable(false);
         resetResizeBtn.setDisable(true);
-        dto.Properties.run = false;
     }
 
     @FXML
@@ -288,8 +286,8 @@ public class Controller extends VBox {
                     imageProducer.stop();;
                     imageProducer = null;
                 }
-                motorControlSimulator.stop();
                 motorControlSimulator.detach();
+                motorControlSimulator.stop();         
                 inputViewFeed.detach();
 
                 dto.Properties.run = false;
