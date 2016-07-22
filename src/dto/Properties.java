@@ -11,11 +11,12 @@ public class Properties {
 
     public static int IMAGE_BUFFER_SIZE = 120;
 
-    public static int SEGMENTATION_WINDOW_SIZE = 50;
+    public static int SEGMENTATION_WINDOW_SIZE = 100;
     public static int SEGMENTATION_COMPONENT_MIN_SIZE = 5;
     public static double SEGMENTATION_THRESHOLD = 0.80; //Magic number. Don't touch.
-    public static int SEGMENTATION_DELAY = 333;
-    public static int SEGMENTATION_FAILURE_THRESHOLD = 30000; //Time until we give up trying
+    public static int SEGMENTATION_DELAY = 100;
+    public static int SEGMENTATION_FAILURE_THRESHOLD = 300000; //Time until we give up trying
+    public static int LOG_FAILURE_THRESHOLD = 30000; //Time until we give up trying
 
     /**
      * MOTOR_STEP_MODE controls what step mode the stepper motors will be

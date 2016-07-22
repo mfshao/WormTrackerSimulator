@@ -1,6 +1,7 @@
 package imageRecording;
 
 import static dto.Properties.IMAGE_EXTENSION;
+import static dto.Properties.LOG_FAILURE_THRESHOLD;
 import static dto.Properties.SEGMENTATION_FAILURE_THRESHOLD;
 import imageAcquisition.ImageProducer;
 import imageProcessing.ImageTools.ImageEntry;
@@ -55,7 +56,7 @@ public class LogSimulator implements Runnable {
                 try (FileWriter fw = new FileWriter(file)) {
                     imageProducer.clear();
                     while (run) {
-                        if (System.currentTimeMillis() - lastLog > SEGMENTATION_FAILURE_THRESHOLD) {
+                        if (System.currentTimeMillis() - lastLog > LOG_FAILURE_THRESHOLD) {
                             run = false;
                             System.out.println("break!");
                             break;
@@ -63,7 +64,7 @@ public class LogSimulator implements Runnable {
                         if (frame < totalFrame - 10) {
                             if ((imageProducer.size() < 10)) {
                                 try {
-                                    System.out.println(imageProducer.size());
+//                                    System.out.println(imageProducer.size());
                                     Thread.sleep(100);
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
@@ -72,19 +73,18 @@ public class LogSimulator implements Runnable {
                             }
                         } else {
                             try {
-                                System.out.println(imageProducer.size());
+//                                System.out.println(imageProducer.size());
                                 Thread.sleep(200);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
                         }
                         ImageEntry entry = imageProducer.get();
-                        synchronized(entry){
-                            
-                        }
                         if (entry != null) {
+                            synchronized (entry) {
+
+                            }
                             lastLog = System.currentTimeMillis();
-                            System.out.println("logtime update");
                             try {
                                 fw.write(String.format("%07d %d %d %d %d%n", frame, entry.timeStamp, entry.x, entry.y, entry.moving));
                                 os.writeInt(frame);

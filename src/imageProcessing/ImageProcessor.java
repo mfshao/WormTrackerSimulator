@@ -15,6 +15,8 @@ import static dto.Properties.SEGMENTATION_THRESHOLD;
 import static dto.Properties.SEGMENTATION_WINDOW_SIZE;
 
 import java.nio.ByteBuffer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ImageProcessor implements Runnable {
 
@@ -38,8 +40,8 @@ public class ImageProcessor implements Runnable {
         thread.start();
         run = true;
     }
-    
-    public void stop(){
+
+    public void stop() {
         run = false;
     }
 
@@ -414,9 +416,11 @@ public class ImageProcessor implements Runnable {
                         }
                         referenceImage = seg;
                         referenceTime = System.currentTimeMillis();
+                        System.out.println("normal ref");
 
                         // If the image is too different... What happened?
                         if (difCount < 600) {
+                            System.out.println("difCount small");
                             try {
                                 prevCentroid = centroid;
                                 centroid = largestComponent(dif);
@@ -435,6 +439,7 @@ public class ImageProcessor implements Runnable {
                             break;
                         }
                     } else {
+                        System.out.println("null ref");
                         referenceImage = seg;
                         referenceTime = System.currentTimeMillis();
                         //centroid = largestComponent(seg);
@@ -442,8 +447,15 @@ public class ImageProcessor implements Runnable {
                 } else {
                     Thread.sleep(10);
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (NullPointerException nex) {
+                run = false;
+                centroid[0] = IMAGE_WIDTH / 2;
+                centroid[1] = IMAGE_HEIGHT / 2;
+                isNew = true;
+                System.out.println("IP END");
+                break;
+            } catch (InterruptedException iex) {
+                iex.printStackTrace();
             }
         }
     }
