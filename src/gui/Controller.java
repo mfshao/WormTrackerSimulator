@@ -51,11 +51,15 @@ public class Controller extends VBox {
     @FXML
     private ChoiceBox outputResSelector;
     @FXML
+    private ChoiceBox fileExtSelector;
+    @FXML
     private ChoiceBox imageResSelector;
     @FXML
     private ImageView imageView;
     @FXML
     private Button startResizeBtn;
+    @FXML
+    private Button resetResizeBtn;
     @FXML
     private Button startSimBtn;
     @FXML
@@ -142,6 +146,15 @@ public class Controller extends VBox {
                     dto.Properties.DS_IMAGE_WIDTH = 1280;
                     break;
             }
+            String fileExtension = (String) fileExtSelector.getSelectionModel().getSelectedItem();
+            switch (fileExtension) {
+                case ".jpeg":
+                    dto.Properties.IMAGE_EXTENSION = ".jpeg";
+                    break;
+                case ".jpg":
+                    dto.Properties.IMAGE_EXTENSION = ".jpg";
+                    break;
+            }
 
             if (inputLocation == null || outputLocation == null) {
                 showWarning("No input/output location specified", "Please choose an input location and an output location first.");
@@ -153,6 +166,7 @@ public class Controller extends VBox {
                 downSampler = new DownSampler(inputDirectory, outputDirectory, statusBox, startResizeBtn);
                 downSampler.start();
                 startResizeBtn.setDisable(true);
+                resetResizeBtn.setDisable(false);
             } catch (Exception ex) {
                 showExceptionError(ex, "FileIOException", "Cannot open File path!");
             }
@@ -162,6 +176,19 @@ public class Controller extends VBox {
         } catch (NullPointerException e) {
             showExceptionError(e, "NullPointerException", "Please select a resolution first!");
         }
+    }
+
+    @FXML
+    protected void resetResize() {
+        if (downSampler != null) {
+            downSampler.stop();
+            downSampler = null;
+        }
+        inputDirectory = null;
+        outputDirectory = null;
+        startResizeBtn.setDisable(false);
+        resetResizeBtn.setDisable(true);
+        dto.Properties.run = false;
     }
 
     @FXML

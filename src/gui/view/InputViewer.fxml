@@ -33,7 +33,7 @@
                                     </items>
                                 </ChoiceBox>
                                 <Label layoutX="13.0" layoutY="148.0" text="Output Location" />
-                                <Button id="startResizeBtn" fx:id="startResizeBtn" layoutX="76.0" layoutY="337.0" mnemonicParsing="false" onMouseClicked="#startResize" text="Start" />
+                                <Button id="startResizeBtn" fx:id="startResizeBtn" layoutX="80.0" layoutY="406.0" mnemonicParsing="false" onMouseClicked="#startResize" text="Start" />
                                 <TextField id="inputLocBox" fx:id="inputLocBox" editable="false" layoutX="16.0" layoutY="25.0" prefHeight="25.0" prefWidth="170.0" />
                                 <ChoiceBox id="outputResSelector" fx:id="outputResSelector" layoutX="19.0" layoutY="255.0" prefHeight="25.0" prefWidth="165.0">
                                     <items>
@@ -48,6 +48,16 @@
                                 <TextField id="outputLocBox" fx:id="outputLocBox" editable="false" layoutX="12.0" layoutY="172.0" prefHeight="25.0" prefWidth="170.0" />
                                 <Button id="inputBrowseBtn" fx:id="inputBrowseBtn" layoutX="107.0" layoutY="56.0" mnemonicParsing="false" onAction="#browseFileLocation" text="Browse..." />
                                 <Button id="outputBrowseBtn" fx:id="outputBrowseBtn" layoutX="103.0" layoutY="203.0" mnemonicParsing="false" onAction="#browseFileLocation" text="Browse..." />
+                        <Button id="resetResizeBtn" fx:id="resetResizeBtn" layoutX="78.0" layoutY="444.0" mnemonicParsing="false" onAction="#resetResize" text="Reset" />
+                        <ChoiceBox id="fileExtSelector" fx:id="fileExtSelector" layoutX="19.0" layoutY="334.0" prefHeight="25.0" prefWidth="165.0">
+                           <items>
+                              <FXCollections fx:factory="observableArrayList">
+                                 <String fx:value=".jpeg" />
+                                 <String fx:value=".jpg" />
+                              </FXCollections>
+                           </items>
+                        </ChoiceBox>
+                        <Label layoutX="21.0" layoutY="317.0" text="File Extension" />
                             </children>
                         </AnchorPane>
                     </content>
