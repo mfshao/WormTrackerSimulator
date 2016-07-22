@@ -52,8 +52,8 @@
                         <ChoiceBox id="fileExtSelector" fx:id="fileExtSelector" layoutX="19.0" layoutY="334.0" prefHeight="25.0" prefWidth="165.0">
                            <items>
                               <FXCollections fx:factory="observableArrayList">
-                                 <String fx:value=".jpeg" />
                                  <String fx:value=".jpg" />
+                                 <String fx:value=".jpeg" />
                               </FXCollections>
                            </items>
                         </ChoiceBox>
@@ -69,8 +69,8 @@
                                 <TextField id="imageSeqLocBox" fx:id="imageSeqLocBox" editable="false" layoutX="14.0" layoutY="53.0" prefHeight="25.0" prefWidth="170.0" />
                                 <Label layoutX="14.0" layoutY="21.0" text="Image Sequence Location" />
                                 <Button id="imgBrowseBtn" fx:id="imgBrowseBtn" layoutX="105.0" layoutY="84.0" mnemonicParsing="false" onAction="#browseFileLocation" text="Browse..." />
-                                <Button id="startSimBtn" fx:id="startSimBtn" layoutX="36.0" layoutY="237.0" mnemonicParsing="false" onMouseClicked="#startSimulation" text="Start Simulation" />
-                                <Button id="endSimBtn" fx:id="endSimBtn" layoutX="39.0" layoutY="288.0" mnemonicParsing="false" onMouseClicked="#endSimulation" text="End Simulation" />
+                                <Button id="startSimBtn" fx:id="startSimBtn" layoutX="36.0" layoutY="318.0" mnemonicParsing="false" onMouseClicked="#startSimulation" text="Start Simulation" />
+                                <Button id="endSimBtn" fx:id="endSimBtn" layoutX="39.0" layoutY="369.0" mnemonicParsing="false" onMouseClicked="#endSimulation" text="End Simulation" />
                         <ChoiceBox id="imageResSelector" fx:id="imageResSelector" layoutX="17.0" layoutY="155.0" prefHeight="25.0" prefWidth="165.0">
                            <items>
                               <FXCollections fx:factory="observableArrayList">
@@ -81,6 +81,15 @@
                            </items>
                         </ChoiceBox>
                         <Label layoutX="17.0" layoutY="130.0" text="Image Resolution" />
+                        <Label layoutX="17.0" layoutY="213.0" text="File Extension" />
+                        <ChoiceBox id="fileExtSelector" fx:id="fileExtSelector1" layoutX="17.0" layoutY="231.0" prefHeight="25.0" prefWidth="165.0">
+                           <items>
+                              <FXCollections fx:factory="observableArrayList">
+                                 <String fx:value=".jpg" />
+                                 <String fx:value=".jpeg" />
+                              </FXCollections>
+                           </items>
+                        </ChoiceBox>
                             </children>
                         </AnchorPane>
                     </content>

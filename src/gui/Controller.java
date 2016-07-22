@@ -53,6 +53,8 @@ public class Controller extends VBox {
     @FXML
     private ChoiceBox fileExtSelector;
     @FXML
+    private ChoiceBox fileExtSelector1;
+    @FXML
     private ChoiceBox imageResSelector;
     @FXML
     private ImageView imageView;
@@ -215,6 +217,15 @@ public class Controller extends VBox {
                     case "1280*960":
                         dto.Properties.IMAGE_HEIGHT = 960;
                         dto.Properties.IMAGE_WIDTH = 1280;
+                        break;
+                }
+                String fileExtension = (String) fileExtSelector1.getSelectionModel().getSelectedItem();
+                switch (fileExtension) {
+                    case ".jpeg":
+                        dto.Properties.IMAGE_EXTENSION = ".jpeg";
+                        break;
+                    case ".jpg":
+                        dto.Properties.IMAGE_EXTENSION = ".jpg";
                         break;
                 }
 
