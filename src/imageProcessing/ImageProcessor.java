@@ -28,6 +28,7 @@ public class ImageProcessor implements Runnable {
     private boolean confident = false;
     private boolean isNew = true;
     private int consecutiveConfidence = 0;
+    private int difCount = -1;
     private final Thread thread;
     public boolean run = true;
 
@@ -389,6 +390,10 @@ public class ImageProcessor implements Runnable {
             try {
                 if (System.currentTimeMillis() - referenceTime > SEGMENTATION_DELAY) {
                     ImageEntry entry = input.peek();
+                    if(difCount == 0){
+                        System.out.println("difCount zero");
+                        entry = input.get();
+                    }
                     if (entry == null) {
                         // Thread just started, no images to peek! Wait a bit.
                         Thread.sleep(500);
@@ -405,7 +410,7 @@ public class ImageProcessor implements Runnable {
                     if (referenceImage != null) {
                         // Calculate Difference Image
                         boolean[][] dif = new boolean[seg.length][seg[0].length];
-                        int difCount = 0;
+                        difCount = 0;
                         for (int y = 0; y < IMAGE_HEIGHT; y++) {
                             for (int x = 0; x < IMAGE_WIDTH; x++) {
                                 if (seg[x][y] && !referenceImage[x][y]) {
@@ -436,6 +441,7 @@ public class ImageProcessor implements Runnable {
                             centroid[0] = IMAGE_WIDTH / 2;
                             centroid[1] = IMAGE_HEIGHT / 2;
                             isNew = true;
+                            System.out.println("break!");
                             break;
                         }
                     } else {

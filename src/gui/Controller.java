@@ -251,6 +251,7 @@ public class Controller extends VBox {
                 }
                 motorControlSimulator.start();
                 inputViewFeed = new InputViewFeed(imageProducer, this);
+                dto.Properties.run = true;
                 inputViewFeed.start();
                 inputViewFeed.attach(imageProcessor);
                 logSimulator = new LogSimulator(imageProducer, imageLocation);
