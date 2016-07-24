@@ -290,6 +290,7 @@ public class Controller extends VBox {
                 motorControlSimulator.detach();
                 motorControlSimulator.stop();         
                 inputViewFeed.detach();
+                inputViewFeed = null;
 
                 dto.Properties.run = false;
                 simulating = false;
