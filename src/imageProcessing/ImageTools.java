@@ -3,7 +3,6 @@ package imageProcessing;
 import static dto.Properties.IMAGE_HEIGHT;
 import static dto.Properties.IMAGE_WIDTH;
 import static gui.GUI.showExceptionError;
-import imageRecording.LogSimulator;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;

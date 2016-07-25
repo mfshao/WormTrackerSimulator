@@ -34,7 +34,6 @@ public class Controller extends VBox {
     private ImageProducer imageProducer;
     private ImageProcessor imageProcessor;
     private InputViewFeed inputViewFeed;
-    private LogSimulator logSimulator;
     private DownSampler downSampler;
     private MotorControlSimulator motorControlSimulator;
     public Stage stage;
@@ -195,7 +194,6 @@ public class Controller extends VBox {
     protected void startSimulation() {
         if (simulating) {
             motorControlSimulator.stop();
-            logSimulator.stop();
         } else {
             if (imageLocation == null) {
                 showWarning("No image location specified", "Please choose an image location first.");
@@ -245,7 +243,7 @@ public class Controller extends VBox {
                 motorControlSimulator = new MotorControlSimulator();
                 imageProducer.start();
                 if (imageProcessor == null) {
-                    imageProcessor = new ImageProcessor(imageProducer);
+                    imageProcessor = new ImageProcessor(imageProducer,imageLocation);
                     motorControlSimulator.attach(imageProcessor);
                     imageProcessor.start();
                 }
@@ -254,8 +252,6 @@ public class Controller extends VBox {
                 dto.Properties.run = true;
                 inputViewFeed.start();
                 inputViewFeed.attach(imageProcessor);
-                logSimulator = new LogSimulator(imageProducer, imageLocation);
-                logSimulator.start();
 
                 imageView.setVisible(true);
                 statusBox.setVisible(false);
@@ -278,10 +274,6 @@ public class Controller extends VBox {
                 if (imageProcessor != null) {
                     imageProcessor.stop();
                     imageProcessor = null;
-                }
-                if (logSimulator != null) {
-                    logSimulator.stop();;
-                    logSimulator = null;
                 }
                 if (imageProducer != null) {
                     imageProducer.stop();;

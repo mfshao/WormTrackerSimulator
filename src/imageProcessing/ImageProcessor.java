@@ -3,6 +3,7 @@ package imageProcessing;
 import gui.GUI;
 import imageAcquisition.ImageProducer;
 import imageProcessing.ImageTools.ImageEntry;
+import imageRecording.LogWriter;
 
 import static dto.Properties.IMAGE_HEIGHT;
 import static dto.Properties.IMAGE_WIDTH;
@@ -21,6 +22,7 @@ import java.util.logging.Logger;
 public class ImageProcessor implements Runnable {
 
     private final ImageProducer input;
+    private final LogWriter logOutput;
     private long referenceTime = 0;
     private boolean[][] referenceImage;
     private double[] centroid = {IMAGE_WIDTH / 2, IMAGE_HEIGHT / 2};
@@ -32,8 +34,9 @@ public class ImageProcessor implements Runnable {
     private final Thread thread;
     public boolean run = true;
 
-    public ImageProcessor(ImageProducer in) {
+    public ImageProcessor(ImageProducer in, String destination) {
         input = in;
+        logOutput = new LogWriter(destination);
         thread = new Thread(this);
     }
 
@@ -44,6 +47,7 @@ public class ImageProcessor implements Runnable {
 
     public void stop() {
         run = false;
+        logOutput.close();
     }
 
     private static boolean[][] threshold(byte[] src) {
@@ -386,14 +390,12 @@ public class ImageProcessor implements Runnable {
     @Override
     public void run() {
         long lastSuccess = System.currentTimeMillis();
+        int frame = 0;
         while (run) {
             try {
                 if (System.currentTimeMillis() - referenceTime > SEGMENTATION_DELAY) {
                     ImageEntry entry = input.peek();
-                    if(difCount == 0){
-                        System.out.println("difCount zero");
-                        entry = input.take();
-                    }
+
                     if (entry == null) {
                         // Thread just started, no images to peek! Wait a bit.
                         Thread.sleep(500);
@@ -401,6 +403,7 @@ public class ImageProcessor implements Runnable {
                     }
                     byte[] wrap;
                     synchronized (entry) {
+                        System.out.println(input.size());
                         ByteBuffer img = entry.img;
                         wrap = new byte[img.remaining()];
                         img.get(wrap);
@@ -422,6 +425,13 @@ public class ImageProcessor implements Runnable {
                         referenceImage = seg;
                         referenceTime = System.currentTimeMillis();
                         System.out.println("normal ref");
+                        if (difCount == 0) {
+                            System.out.println("difCount zero");
+                            entry = input.take();
+                            logOutput.write(frame, entry.timeStamp, entry.x, entry.y, entry.moving);
+                            frame++;
+                            continue;
+                        }
 
                         // If the image is too different... What happened?
                         if (difCount < 600) {
@@ -431,8 +441,10 @@ public class ImageProcessor implements Runnable {
                                 centroid = largestComponent(dif);
                                 isNew = true;
                                 lastSuccess = System.currentTimeMillis();
+                                logOutput.write(frame, entry.timeStamp, entry.x, entry.y, entry.moving);
+                                frame++;
                             } catch (SegmentationFailureException e) {
-                                //System.out.println("No components.");
+                                System.out.println("No components.");
                             }
                         }
                         if (System.currentTimeMillis() - lastSuccess > SEGMENTATION_FAILURE_THRESHOLD) {
@@ -454,11 +466,13 @@ public class ImageProcessor implements Runnable {
                     Thread.sleep(10);
                 }
             } catch (NullPointerException nex) {
-                run = false;
+                
                 centroid[0] = IMAGE_WIDTH / 2;
                 centroid[1] = IMAGE_HEIGHT / 2;
                 isNew = true;
                 System.out.println("IP END");
+                nex.printStackTrace();
+                run = false;
                 break;
             } catch (InterruptedException iex) {
                 iex.printStackTrace();
