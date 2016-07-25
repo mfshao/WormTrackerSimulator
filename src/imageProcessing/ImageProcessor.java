@@ -392,7 +392,7 @@ public class ImageProcessor implements Runnable {
                     ImageEntry entry = input.peek();
                     if(difCount == 0){
                         System.out.println("difCount zero");
-                        entry = input.get();
+                        entry = input.take();
                     }
                     if (entry == null) {
                         // Thread just started, no images to peek! Wait a bit.

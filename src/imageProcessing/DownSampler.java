@@ -19,12 +19,11 @@ package imageProcessing;
 import static dto.Properties.DS_IMAGE_HEIGHT;
 import static dto.Properties.DS_IMAGE_WIDTH;
 import static dto.Properties.IMAGE_EXTENSION;
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.awt.Image;
+import java.awt.RenderingHints;
 import java.io.File;
 import java.io.IOException;
-import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javax.imageio.ImageIO;
 
@@ -42,7 +41,6 @@ public final class DownSampler implements Runnable {
     private final int totalFrame;
     public boolean run = true;
     private int frame = 0;
-    
 
     public DownSampler(File inputDirectory, File outputDirectory, TextArea textArea) {
         this.inputDirectory = inputDirectory;
@@ -82,11 +80,14 @@ public final class DownSampler implements Runnable {
             }
             try {
                 BufferedImage img = ImageIO.read(new File(inputDirectory + "\\" + String.format("%07d", frame) + IMAGE_EXTENSION));
-                Image toolkitImage = img.getScaledInstance(DS_IMAGE_WIDTH, DS_IMAGE_HEIGHT, Image.SCALE_AREA_AVERAGING);
                 resizedImage = new BufferedImage(DS_IMAGE_WIDTH, DS_IMAGE_HEIGHT, BufferedImage.TYPE_3BYTE_BGR);
-                Graphics g = resizedImage.getGraphics();
-                g.drawImage(toolkitImage, 0, 0, null);
-                g.dispose();
+                Graphics2D g = resizedImage.createGraphics();
+                try {
+                    g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+                    g.drawImage(img, 0, 0, DS_IMAGE_WIDTH, DS_IMAGE_HEIGHT, null);
+                } finally {
+                    g.dispose();
+                }
                 try {
                     ImageIO.write(resizedImage, "jpeg", new File(outputDirectory + "\\" + String.format("%07d", frame++) + IMAGE_EXTENSION));
                 } catch (IOException e) {

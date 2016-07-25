@@ -7,6 +7,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import imageAqcuisition.imageInputSource.ImageInputSource;
 import imageProcessing.ImageTools.ImageEntry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A producer thread for getting images from an image source and adding them to
@@ -38,7 +40,7 @@ public class ImageProducer implements Runnable {
             if (input.isReady()) {
                 buffer.add(new ImageEntry(input.getImage()));
                 if (buffer.size() > IMAGE_BUFFER_SIZE) {
-                    get(); //Too many in buffer... Throw frames away.
+                    poll(); //Too many in buffer... Throw frames away.
                 }
             }
         }
@@ -56,12 +58,20 @@ public class ImageProducer implements Runnable {
     }
 
     /**
-     * @return Image at the top of the queue !!!WAITS FOR NEW IMAGE IF EMPTY!!!
+     * @return Image at the top of the queue !!!DONT WAITS FOR NEW IMAGE IF
+     * EMPTY!!!
      */
-    public ImageEntry get() {
-
+    public ImageEntry poll() {
         return buffer.poll();
+    }
 
+    public ImageEntry take() {
+        try {
+            return buffer.take();
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
+        }
+        return null;
     }
 
     /**

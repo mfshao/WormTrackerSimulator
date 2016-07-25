@@ -2,7 +2,6 @@ package imageRecording;
 
 import static dto.Properties.IMAGE_EXTENSION;
 import static dto.Properties.LOG_FAILURE_THRESHOLD;
-import static dto.Properties.SEGMENTATION_FAILURE_THRESHOLD;
 import imageAcquisition.ImageProducer;
 import imageProcessing.ImageTools.ImageEntry;
 
@@ -11,6 +10,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 public class LogSimulator implements Runnable {
 
@@ -64,7 +64,8 @@ public class LogSimulator implements Runnable {
                         if (frame < totalFrame - 10) {
                             if ((imageProducer.size() < 10)) {
                                 try {
-//                                    System.out.println(imageProducer.size());
+                                  System.out.println("continuing");
+                                   System.out.println(imageProducer.size());
                                     Thread.sleep(100);
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
@@ -79,10 +80,10 @@ public class LogSimulator implements Runnable {
                                 e.printStackTrace();
                             }
                         }
-                        ImageEntry entry = imageProducer.get();
+                        ImageEntry entry = imageProducer.poll();
                         if (entry != null) {
                             synchronized (entry) {
-
+                                ByteBuffer img = entry.img;
                             }
                             lastLog = System.currentTimeMillis();
                             try {
