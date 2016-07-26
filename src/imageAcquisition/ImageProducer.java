@@ -39,6 +39,7 @@ public class ImageProducer implements Runnable {
         while (run) {
             if (input.isReady()&&buffer.size() < IMAGE_BUFFER_SIZE) {
                 buffer.add(new ImageEntry(input.getImage()));
+                input.updateSeek();
 //                if (buffer.size() > IMAGE_BUFFER_SIZE) {
 //                    poll(); //Too many in buffer... Throw frames away.
 //                }
@@ -46,7 +47,7 @@ public class ImageProducer implements Runnable {
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(ImageProducer.class.getName()).log(Level.SEVERE, null, ex);
+                    ex.printStackTrace();
                 }
             }
         }

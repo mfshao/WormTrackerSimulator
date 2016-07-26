@@ -19,6 +19,7 @@ package imageProcessing;
 import static dto.Properties.DS_IMAGE_HEIGHT;
 import static dto.Properties.DS_IMAGE_WIDTH;
 import static dto.Properties.IMAGE_EXTENSION;
+import gui.GUI;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.RenderingHints;
@@ -72,8 +73,9 @@ public final class DownSampler implements Runnable {
 
     @Override
     public void run() {
-        textArea.appendText(Integer.toString(totalFrame));
-        textArea.appendText("\n");
+//        textArea.appendText(Integer.toString(totalFrame));
+//        textArea.appendText("\n");
+        GUI.getController().updateStatusBox(Integer.toString(totalFrame));
         while (run) {
             if (frame >= totalFrame) {
                 run = false;
@@ -92,14 +94,17 @@ public final class DownSampler implements Runnable {
                     ImageIO.write(resizedImage, "jpeg", new File(outputDirectory + "\\" + String.format("%07d", frame++) + IMAGE_EXTENSION));
                 } catch (IOException e) {
                 } finally {
+                    GUI.getController().updateStatusBox(outputDirectory + "\\" + String.format("%07d", frame) + IMAGE_EXTENSION);
 //                    textArea.appendText(outputDirectory + "\\" + String.format("%07d", frame++) + IMAGE_EXTENSION);
 //                    textArea.appendText("\n");
                 }
             } catch (IOException ex) {
             }
         }
-        textArea.appendText("Done!");
-        textArea.appendText("\n");
+//        textArea.appendText("Done!");
+//        textArea.appendText("\n");
+        GUI.getController().updateStatusBox("Done!");
+        dto.Properties.resizerun = false;
         this.stop();
     }
 }

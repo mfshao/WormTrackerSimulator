@@ -1,6 +1,5 @@
 package imageProcessing;
 
-import gui.GUI;
 import imageAcquisition.ImageProducer;
 import imageProcessing.ImageTools.ImageEntry;
 import imageRecording.LogWriter;
@@ -16,8 +15,6 @@ import static dto.Properties.SEGMENTATION_THRESHOLD;
 import static dto.Properties.SEGMENTATION_WINDOW_SIZE;
 
 import java.nio.ByteBuffer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class ImageProcessor implements Runnable {
 
@@ -198,6 +195,7 @@ public class ImageProcessor implements Runnable {
         if (entry == null) {
             return;
         }
+        System.out.println("new ref");
         byte[] wrap;
         synchronized (entry) {
             ByteBuffer img = entry.img;
@@ -394,7 +392,7 @@ public class ImageProcessor implements Runnable {
         while (run) {
             try {
                 if (System.currentTimeMillis() - referenceTime > SEGMENTATION_DELAY) {
-                    ImageEntry entry = input.peek();
+                    ImageEntry entry = input.poll();
 
                     if (entry == null) {
                         // Thread just started, no images to peek! Wait a bit.
@@ -427,7 +425,7 @@ public class ImageProcessor implements Runnable {
                         System.out.println("normal ref");
                         if (difCount == 0) {
                             System.out.println("difCount zero");
-                            entry = input.take();
+                            //entry = input.take();
                             logOutput.write(frame, entry.timeStamp, entry.x, entry.y, entry.moving);
                             frame++;
                             continue;
@@ -441,8 +439,6 @@ public class ImageProcessor implements Runnable {
                                 centroid = largestComponent(dif);
                                 isNew = true;
                                 lastSuccess = System.currentTimeMillis();
-                                logOutput.write(frame, entry.timeStamp, entry.x, entry.y, entry.moving);
-                                frame++;
                             } catch (SegmentationFailureException e) {
                                 System.out.println("No components.");
                             }
@@ -454,6 +450,7 @@ public class ImageProcessor implements Runnable {
                             centroid[1] = IMAGE_HEIGHT / 2;
                             isNew = true;
                             System.out.println("break!");
+                            logOutput.close();
                             break;
                         }
                     } else {
@@ -462,15 +459,18 @@ public class ImageProcessor implements Runnable {
                         referenceTime = System.currentTimeMillis();
                         //centroid = largestComponent(seg);
                     }
+                    logOutput.write(frame, entry.timeStamp, entry.x, entry.y, entry.moving);
+                    frame++;
                 } else {
                     Thread.sleep(10);
                 }
             } catch (NullPointerException nex) {
-                
+
                 centroid[0] = IMAGE_WIDTH / 2;
                 centroid[1] = IMAGE_HEIGHT / 2;
                 isNew = true;
                 System.out.println("IP END");
+                logOutput.close();
                 nex.printStackTrace();
                 run = false;
                 break;

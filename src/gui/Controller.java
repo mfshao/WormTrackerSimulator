@@ -8,7 +8,6 @@ import imageProcessing.DownSampler;
 import imageProcessing.ImageProcessor;
 import imageProcessing.ImageTools;
 import imageProcessing.ImageTools.ImageEntry;
-import imageRecording.LogSimulator;
 import motorControl.MotorControlSimulator;
 import java.io.File;
 import java.nio.ByteBuffer;
@@ -81,6 +80,10 @@ public class Controller extends VBox {
     public void updateImageView(ByteBuffer b) {
         Image img = ImageTools.toJavaFXImage(b); //Oh goodness...
         imageView.setImage(img);
+    }
+
+    public void updateStatusBox(String str) {
+        statusBox.setText(str);
     }
 
     @FXML
@@ -166,6 +169,7 @@ public class Controller extends VBox {
                 outputDirectory = new File(outputLocation);
                 downSampler = new DownSampler(inputDirectory, outputDirectory, statusBox);
                 downSampler.start();
+                dto.Properties.resizerun = true;
                 startResizeBtn.setDisable(true);
                 resetResizeBtn.setDisable(false);
             } catch (Exception ex) {
@@ -241,17 +245,18 @@ public class Controller extends VBox {
                     return;
                 }
                 motorControlSimulator = new MotorControlSimulator();
-                imageProducer.start();
                 if (imageProcessor == null) {
-                    imageProcessor = new ImageProcessor(imageProducer,imageLocation);
+                    imageProcessor = new ImageProcessor(imageProducer, imageLocation);
                     motorControlSimulator.attach(imageProcessor);
-                    imageProcessor.start();
                 }
                 motorControlSimulator.start();
                 inputViewFeed = new InputViewFeed(imageProducer, this);
-                dto.Properties.run = true;
+
+                dto.Properties.simrun = true;
                 inputViewFeed.start();
                 inputViewFeed.attach(imageProcessor);
+                imageProducer.start();
+                imageProcessor.start();
 
                 imageView.setVisible(true);
                 statusBox.setVisible(false);
@@ -280,11 +285,11 @@ public class Controller extends VBox {
                     imageProducer = null;
                 }
                 motorControlSimulator.detach();
-                motorControlSimulator.stop();         
+                motorControlSimulator.stop();
                 inputViewFeed.detach();
                 inputViewFeed = null;
 
-                dto.Properties.run = false;
+                dto.Properties.simrun = false;
                 simulating = false;
                 startSimBtn.setDisable(false);
                 endSimBtn.setDisable(true);
@@ -294,13 +299,6 @@ public class Controller extends VBox {
 
     public void initialize() {
         accordion.setExpandedPane(resizePane);
-        statusBox.textProperty().addListener(new ChangeListener<Object>() {
-            @Override
-            public void changed(ObservableValue<? extends Object> observable, Object oldValue, Object newValue) {
-                statusBox.setScrollTop(Double.MAX_VALUE);
-            }
-        });
-
     }
 
     public static class InputViewFeed implements Runnable {
@@ -330,7 +328,7 @@ public class Controller extends VBox {
 
         @Override
         public void run() {
-            while (dto.Properties.run) {
+            while (dto.Properties.simrun) {
                 ImageEntry entry = src.peek();
                 if (entry == null) {
                     try {
@@ -349,6 +347,7 @@ public class Controller extends VBox {
                         clone.put(img);
                         img.rewind();
                     } catch (NullPointerException e) {
+                        e.printStackTrace();
                     }
                 }
                 if (clone != null) {

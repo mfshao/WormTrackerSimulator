@@ -2,7 +2,8 @@ package dto;
 
 public class Properties {
 
-    public static volatile boolean run = true;
+    public static volatile boolean simrun = true;    
+    public static volatile boolean resizerun = true;
 
     public static int DS_IMAGE_WIDTH = 640;
     public static int DS_IMAGE_HEIGHT = 480;

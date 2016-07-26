@@ -5,6 +5,7 @@
  */
 package imageRecording;
 
+import static dto.Properties.IMAGE_EXTENSION;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -23,19 +24,32 @@ public class LogWriter {
     private DataOutputStream os = null;
     private FileWriter fw = null;
     private final String outputDirectory;
+    private int totalFrame;
 
     public LogWriter(String destination) {
         outputDirectory = destination;
         try {
-            os = new DataOutputStream(new FileOutputStream(new File(outputDirectory + "/log.dat")));
+            os = new DataOutputStream(new FileOutputStream(new File(outputDirectory + "\\log.dat")));
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
         }
         try {
-            fw = new FileWriter(new File(outputDirectory + "/log.txt"));
+            fw = new FileWriter(new File(outputDirectory + "\\log.txt"));
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+        totalFrame = getImageCount(destination);
+    }
+
+    public int getImageCount(String destination) {
+        int count = 0;
+        File files = new File(destination + "\\");
+        for (File f : files.listFiles()) {
+            if (f.isFile() && (f.getName().endsWith(IMAGE_EXTENSION))) {
+                count++;
+            }
+        }
+        return count;
     }
 
     public void close() {
@@ -43,6 +57,7 @@ public class LogWriter {
             try {
                 os.close();
             } catch (IOException ex) {
+                ex.printStackTrace();
             }
             os = null;
         }
@@ -50,6 +65,7 @@ public class LogWriter {
             try {
                 fw.close();
             } catch (IOException ex) {
+                ex.printStackTrace();
             }
             fw = null;
         }
@@ -62,13 +78,18 @@ public class LogWriter {
             os.writeLong(timeStamp);
             os.writeInt(x);
             os.writeInt(y);
-            os.writeInt(moving);         
+            os.writeInt(moving);
             if (frame % 30 == 0) {
                 System.out.println("flush!");
                 os.flush();
             }
             System.out.println("frame: " + frame);
+            if (frame >= totalFrame - 1) {
+                close();
+                System.out.println("closed");
+            }
         } catch (IOException ex) {
+            ex.printStackTrace();
         }
     }
 }
