@@ -1,5 +1,6 @@
 package gui;
 
+import static dto.Properties.IMAGE_EXTENSION;
 import static gui.GUI.showExceptionError;
 import static gui.GUI.showWarning;
 import imageAcquisition.ImageProducer;
@@ -12,8 +13,6 @@ import motorControl.MotorControlSimulator;
 import java.io.File;
 import java.nio.ByteBuffer;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Accordion;
@@ -41,7 +40,6 @@ public class Controller extends VBox {
     private String imageLocation;
     private File inputDirectory;
     private File outputDirectory;
-    private File imageDirectory;
     private boolean simulating = false;
 
     @FXML
@@ -84,6 +82,17 @@ public class Controller extends VBox {
 
     public void updateStatusBox(String str) {
         statusBox.setText(str);
+    }
+    
+    public void setImageCount(String destination) {
+        int count = 0;
+        File files = new File(destination + "\\");
+        for (File f : files.listFiles()) {
+            if (f.isFile() && (f.getName().endsWith(IMAGE_EXTENSION))) {
+                count++;
+            }
+        }
+        dto.Properties.imagecount = count;
     }
 
     @FXML
@@ -165,9 +174,10 @@ public class Controller extends VBox {
                 return;
             }
             try {
+                setImageCount(inputLocation);
                 inputDirectory = new File(inputLocation);
                 outputDirectory = new File(outputLocation);
-                downSampler = new DownSampler(inputDirectory, outputDirectory, statusBox);
+                downSampler = new DownSampler(inputDirectory, outputDirectory);
                 downSampler.start();
                 dto.Properties.resizerun = true;
                 startResizeBtn.setDisable(true);
@@ -239,6 +249,7 @@ public class Controller extends VBox {
                 showExceptionError(e, "NullPointerException", "Please select a resolution first!");
             }
             try {
+                setImageCount(imageLocation);
                 imageProducer = new ImageProducer(new ImageSequence(imageLocation));
                 if (imageProducer == null) {
                     showWarning("Input folder unreadable", "Input folder unreadable.");

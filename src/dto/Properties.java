@@ -4,6 +4,8 @@ public class Properties {
 
     public static volatile boolean simrun = true;    
     public static volatile boolean resizerun = true;
+    
+    public static volatile int imagecount = 0;
 
     public static int DS_IMAGE_WIDTH = 640;
     public static int DS_IMAGE_HEIGHT = 480;

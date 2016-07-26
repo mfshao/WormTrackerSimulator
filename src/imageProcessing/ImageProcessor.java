@@ -2,7 +2,7 @@ package imageProcessing;
 
 import imageAcquisition.ImageProducer;
 import imageProcessing.ImageTools.ImageEntry;
-import imageRecording.LogWriter;
+import logRecording.LogWriter;
 
 import static dto.Properties.IMAGE_HEIGHT;
 import static dto.Properties.IMAGE_WIDTH;

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package imageRecording;
+package logRecording;
 
 import static dto.Properties.IMAGE_EXTENSION;
 import java.io.DataOutputStream;
@@ -24,7 +24,6 @@ public class LogWriter {
     private DataOutputStream os = null;
     private FileWriter fw = null;
     private final String outputDirectory;
-    private int totalFrame;
 
     public LogWriter(String destination) {
         outputDirectory = destination;
@@ -38,18 +37,6 @@ public class LogWriter {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-        totalFrame = getImageCount(destination);
-    }
-
-    public int getImageCount(String destination) {
-        int count = 0;
-        File files = new File(destination + "\\");
-        for (File f : files.listFiles()) {
-            if (f.isFile() && (f.getName().endsWith(IMAGE_EXTENSION))) {
-                count++;
-            }
-        }
-        return count;
     }
 
     public void close() {
@@ -84,7 +71,7 @@ public class LogWriter {
                 os.flush();
             }
             System.out.println("frame: " + frame);
-            if (frame >= totalFrame - 1) {
+            if (frame >= dto.Properties.imagecount - 1) {
                 close();
                 System.out.println("closed");
             }

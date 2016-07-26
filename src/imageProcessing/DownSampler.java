@@ -38,16 +38,12 @@ public final class DownSampler implements Runnable {
     private final File inputDirectory;
     private final File outputDirectory;
     private final Thread thread;
-    private final TextArea textArea;
-    private final int totalFrame;
     public boolean run = true;
     private int frame = 0;
 
-    public DownSampler(File inputDirectory, File outputDirectory, TextArea textArea) {
+    public DownSampler(File inputDirectory, File outputDirectory) {
         this.inputDirectory = inputDirectory;
         this.outputDirectory = outputDirectory;
-        this.textArea = textArea;
-        this.totalFrame = this.getImageCount(inputDirectory);
         thread = new Thread(this);
     }
 
@@ -61,23 +57,13 @@ public final class DownSampler implements Runnable {
         run = false;
     }
 
-    public int getImageCount(File inputDirectory) {
-        int count = 0;
-        for (File f : inputDirectory.listFiles()) {
-            if (f.isFile() && (f.getName().endsWith(IMAGE_EXTENSION))) {
-                count++;
-            }
-        }
-        return count;
-    }
-
     @Override
     public void run() {
 //        textArea.appendText(Integer.toString(totalFrame));
 //        textArea.appendText("\n");
-        GUI.getController().updateStatusBox(Integer.toString(totalFrame));
+        GUI.getController().updateStatusBox(Integer.toString(dto.Properties.imagecount));
         while (run) {
-            if (frame >= totalFrame) {
+            if (frame >= dto.Properties.imagecount) {
                 run = false;
             }
             try {
