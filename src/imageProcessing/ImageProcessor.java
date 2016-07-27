@@ -20,6 +20,7 @@ public class ImageProcessor implements Runnable {
 
     private final ImageProducer input;
     private final LogWriter logOutput;
+    private int[] movingMatrix;
     private long referenceTime = 0;
     private boolean[][] referenceImage;
     private double[] centroid = {IMAGE_WIDTH / 2, IMAGE_HEIGHT / 2};
@@ -31,8 +32,10 @@ public class ImageProcessor implements Runnable {
     private final Thread thread;
     public boolean run = true;
 
-    public ImageProcessor(ImageProducer in, String destination) {
+    public ImageProcessor(ImageProducer in, String source, String destination) {
         input = in;
+        LogReader logInput = new LogReader(source);
+        movingMatrix = logInput.getMovingMatrix();
         logOutput = new LogWriter(destination);
         thread = new Thread(this);
     }
@@ -426,7 +429,7 @@ public class ImageProcessor implements Runnable {
                         if (difCount == 0) {
                             System.out.println("difCount zero");
                             //entry = input.take();
-                            logOutput.write(frame, entry.timeStamp, entry.x, entry.y, entry.moving);
+                            logOutput.write(frame, entry.timeStamp, entry.x, entry.y, movingMatrix[frame]);
                             frame++;
                             continue;
                         }
@@ -459,7 +462,7 @@ public class ImageProcessor implements Runnable {
                         referenceTime = System.currentTimeMillis();
                         //centroid = largestComponent(seg);
                     }
-                    logOutput.write(frame, entry.timeStamp, entry.x, entry.y, entry.moving);
+                    logOutput.write(frame, entry.timeStamp, entry.x, entry.y, movingMatrix[frame]);
                     frame++;
                 } else {
                     Thread.sleep(10);

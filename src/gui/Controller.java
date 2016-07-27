@@ -38,6 +38,7 @@ public class Controller extends VBox {
     private String inputLocation;
     private String outputLocation;
     private String imageLocation;
+    private String originalLogLocation;
     private File inputDirectory;
     private File outputDirectory;
     private boolean simulating = false;
@@ -69,6 +70,8 @@ public class Controller extends VBox {
     @FXML
     private TextField imageSeqLocBox;
     @FXML
+    private TextField originalLogLocBox;
+    @FXML
     private Accordion accordion;
     @FXML
     private TitledPane resizePane;
@@ -83,7 +86,7 @@ public class Controller extends VBox {
     public void updateStatusBox(String str) {
         statusBox.setText(str);
     }
-    
+
     public void setImageCount(String destination) {
         int count = 0;
         File files = new File(destination + "\\");
@@ -118,6 +121,11 @@ public class Controller extends VBox {
                     locationTF = imageSeqLocBox;
                     imageLocation = chooser.showDialog(stage).getAbsolutePath();
                     locationTF.setText(imageLocation);
+                    break;
+                case "logBrowseBtn":
+                    locationTF = originalLogLocBox;
+                    originalLogLocation = chooser.showDialog(stage).getAbsolutePath();
+                    locationTF.setText(originalLogLocation);
                     break;
                 default:
                     break;
@@ -213,6 +221,10 @@ public class Controller extends VBox {
                 showWarning("No image location specified", "Please choose an image location first.");
                 return;
             }
+            if (originalLogLocation == null) {
+                showWarning("No original log file location specified", "Please choose an original log file first.");
+                return;
+            }
             try {
                 String imageResolution = (String) imageResSelector.getSelectionModel().getSelectedItem();
                 switch (imageResolution) {
@@ -257,7 +269,7 @@ public class Controller extends VBox {
                 }
                 motorControlSimulator = new MotorControlSimulator();
                 if (imageProcessor == null) {
-                    imageProcessor = new ImageProcessor(imageProducer, imageLocation);
+                    imageProcessor = new ImageProcessor(imageProducer, originalLogLocation, imageLocation);
                     motorControlSimulator.attach(imageProcessor);
                 }
                 motorControlSimulator.start();

@@ -6,14 +6,11 @@
 package imageProcessing;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import gui.GUI;
 
 /**
  *
@@ -28,6 +25,7 @@ public class LogReader {
         inputDirectory = source;
         try {
             is = new DataInputStream(new FileInputStream(new File(inputDirectory + "\\log.dat")));
+//            GUI.getController().updateStatusBox(source);
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
         }
@@ -37,14 +35,14 @@ public class LogReader {
         int[] movingMatrix = new int[dto.Properties.imagecount];
         try {
             int i = 0;
-            while (is.available() > 0) {
+            while ((is.available() > 0) && (i < dto.Properties.imagecount)) {
                 is.readInt();//frame
                 is.readLong();//timeStamp
                 is.readInt();//x
                 is.readInt();//y
                 movingMatrix[i++] = is.readInt();
             }
-
+            is.close();
         } catch (IOException ex) {
             ex.printStackTrace();
         }

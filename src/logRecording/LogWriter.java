@@ -5,15 +5,12 @@
  */
 package logRecording;
 
-import static dto.Properties.IMAGE_EXTENSION;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -37,6 +34,7 @@ public class LogWriter {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+        
     }
 
     public void close() {
