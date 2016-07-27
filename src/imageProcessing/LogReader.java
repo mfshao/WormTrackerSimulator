@@ -11,6 +11,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import gui.GUI;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -31,6 +33,17 @@ public class LogReader {
         }
     }
 
+    public void close() {
+        if (is != null) {
+            try {
+                is.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+            is = null;
+        }
+    }
+
     public int[] getMovingMatrix() {
         int[] movingMatrix = new int[dto.Properties.imagecount];
         try {
@@ -42,7 +55,7 @@ public class LogReader {
                 is.readInt();//y
                 movingMatrix[i++] = is.readInt();
             }
-            is.close();
+            close();
         } catch (IOException ex) {
             ex.printStackTrace();
         }

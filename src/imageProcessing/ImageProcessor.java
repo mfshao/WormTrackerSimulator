@@ -20,6 +20,7 @@ public class ImageProcessor implements Runnable {
 
     private final ImageProducer input;
     private final LogWriter logOutput;
+    private final LogReader logInput;
     private int[] movingMatrix;
     private long referenceTime = 0;
     private boolean[][] referenceImage;
@@ -34,7 +35,7 @@ public class ImageProcessor implements Runnable {
 
     public ImageProcessor(ImageProducer in, String source, String destination) {
         input = in;
-        LogReader logInput = new LogReader(source);
+        logInput = new LogReader(source);
         movingMatrix = logInput.getMovingMatrix();
         logOutput = new LogWriter(destination);
         thread = new Thread(this);
@@ -48,6 +49,7 @@ public class ImageProcessor implements Runnable {
     public void stop() {
         run = false;
         logOutput.close();
+        logInput.close();
     }
 
     private static boolean[][] threshold(byte[] src) {
@@ -429,7 +431,7 @@ public class ImageProcessor implements Runnable {
                         if (difCount == 0) {
                             System.out.println("difCount zero");
                             //entry = input.take();
-                            logOutput.write(frame, entry.timeStamp, entry.x, entry.y, movingMatrix[frame]);
+                            logOutput.write(frame, entry.timeStamp, (int) centroid[0], (int) centroid[1], movingMatrix[frame]);
                             frame++;
                             continue;
                         }
@@ -462,7 +464,7 @@ public class ImageProcessor implements Runnable {
                         referenceTime = System.currentTimeMillis();
                         //centroid = largestComponent(seg);
                     }
-                    logOutput.write(frame, entry.timeStamp, entry.x, entry.y, movingMatrix[frame]);
+                    logOutput.write(frame, entry.timeStamp, (int) centroid[0], (int) centroid[1], movingMatrix[frame]);
                     frame++;
                 } else {
                     Thread.sleep(10);

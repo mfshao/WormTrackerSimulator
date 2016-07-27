@@ -86,9 +86,9 @@ public class MotorControlSimulator implements Runnable {
     /**
      * @return If we're currently in a move operation
      */
-    public static int isMoving() {
-        return moving;
-    }
+//    public static int isMoving() {
+//        return moving;
+//    }
 
 
     /**
@@ -152,9 +152,9 @@ public class MotorControlSimulator implements Runnable {
         return y;
     }
 
-    public static int[] getCentroid() {
-        return centroid;
-    }
+//    public static int[] getCentroid() {
+//        return centroid;
+//    }
 
     /**
      * Run this object in another thread
