@@ -21,7 +21,7 @@ public class ImageProcessor implements Runnable {
     private final ImageProducer input;
     private final LogWriter logOutput;
     private final LogReader logInput;
-    private int[] movingMatrix;
+    private final int[] movingMatrix;
     private long referenceTime = 0;
     private boolean[][] referenceImage;
     private double[] centroid = {IMAGE_WIDTH / 2, IMAGE_HEIGHT / 2};
@@ -50,6 +50,17 @@ public class ImageProcessor implements Runnable {
         run = false;
         logOutput.close();
         logInput.close();
+    }
+
+    public static int[] getGray(byte[] src) {
+        int[] gray = new int[src.length / 3];
+        for (int i = 0; i < src.length; i += 3) {
+            int r = src[i];
+            int g = src[i + 1];
+            int b = src[i + 2];
+            gray[i / 3] = (int) ((r + g + b) / 3);
+        }
+        return gray;
     }
 
     private static boolean[][] threshold(byte[] src) {

@@ -97,6 +97,51 @@
                         </AnchorPane>
                     </content>
                 </TitledPane>
+            <TitledPane fx:id="intensityPane" animated="false" layoutX="10.0" layoutY="10.0" prefHeight="288.0" prefWidth="202.0" text="Intensity">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="150.0" prefWidth="200.0">
+                     <children>
+                        <Label layoutX="18.0" layoutY="4.0" text="Input Location" />
+                        <Label layoutX="15.0" layoutY="87.0" text="Input Resolution" />
+                        <ChoiceBox id="inputResSelector" fx:id="inputResSelector1" layoutX="14.0" layoutY="105.0" prefHeight="25.0" prefWidth="165.0">
+                           <items>
+                              <FXCollections fx:factory="observableArrayList">
+                                 <String fx:value="640*480" />
+                                 <String fx:value="1280*720" />
+                                 <String fx:value="1280*960" />
+                              </FXCollections>
+                           </items>
+                        </ChoiceBox>
+                        <Label layoutX="13.0" layoutY="148.0" text="Output Location" />
+                        <Button id="startResizeBtn" fx:id="startResizeBtn1" layoutX="80.0" layoutY="406.0" mnemonicParsing="false" onMouseClicked="#startResize" text="Start" />
+                        <TextField id="inputLocBox" fx:id="inputLocBox1" editable="false" layoutX="16.0" layoutY="25.0" prefHeight="25.0" prefWidth="170.0" />
+                        <ChoiceBox id="outputResSelector" fx:id="outputResSelector1" layoutX="19.0" layoutY="255.0" prefHeight="25.0" prefWidth="165.0">
+                           <items>
+                              <FXCollections fx:factory="observableArrayList">
+                                 <String fx:value="640*480" />
+                                 <String fx:value="1280*720" />
+                                 <String fx:value="1280*960" />
+                              </FXCollections>
+                           </items>
+                        </ChoiceBox>
+                        <Label layoutX="21.0" layoutY="234.0" text="Output Resolution" />
+                        <TextField id="outputLocBox" fx:id="outputLocBox1" editable="false" layoutX="12.0" layoutY="172.0" prefHeight="25.0" prefWidth="170.0" />
+                        <Button id="inputBrowseBtn" fx:id="inputBrowseBtn1" layoutX="107.0" layoutY="56.0" mnemonicParsing="false" onAction="#browseFileLocation" text="Browse..." />
+                        <Button id="outputBrowseBtn" fx:id="outputBrowseBtn1" layoutX="103.0" layoutY="203.0" mnemonicParsing="false" onAction="#browseFileLocation" text="Browse..." />
+                        <Button id="resetResizeBtn" fx:id="resetResizeBtn1" layoutX="78.0" layoutY="444.0" mnemonicParsing="false" onAction="#resetResize" text="Reset" />
+                        <ChoiceBox id="fileExtSelector" fx:id="fileExtSelector2" layoutX="19.0" layoutY="334.0" prefHeight="25.0" prefWidth="165.0">
+                           <items>
+                              <FXCollections fx:factory="observableArrayList">
+                                 <String fx:value=".jpg" />
+                                 <String fx:value=".jpeg" />
+                              </FXCollections>
+                           </items>
+                        </ChoiceBox>
+                        <Label layoutX="21.0" layoutY="317.0" text="File Extension" />
+                     </children>
+                  </AnchorPane>
+               </content>
+            </TitledPane>
             </panes>
         </Accordion>
         <!--/AnchorPane-->
