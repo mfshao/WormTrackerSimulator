@@ -15,19 +15,22 @@ import java.nio.ByteBuffer;
  */
 public class IntensityExportor {
 
-    ImageEntry entry;
+    ByteBuffer img;
 
-    public IntensityExportor(ImageEntry ie) {
-        entry = ie;
+    public IntensityExportor(ByteBuffer source) {
+        img = source;
     }
 
     public void getIntensities() {
         byte[] wrap;
-        ByteBuffer img = entry.img;
         wrap = new byte[img.remaining()];
         img.get(wrap);
         img.rewind();
         int[] gray = ImageProcessor.getGray(wrap);
+        
+    }
+    
+    public static void main(String[] args){
         
     }
 }
