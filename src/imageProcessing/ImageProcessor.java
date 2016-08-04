@@ -13,8 +13,10 @@ import static dto.Properties.SEGMENTATION_DELAY;
 import static dto.Properties.SEGMENTATION_FAILURE_THRESHOLD;
 import static dto.Properties.SEGMENTATION_THRESHOLD;
 import static dto.Properties.SEGMENTATION_WINDOW_SIZE;
+import java.io.File;
 
 import java.nio.ByteBuffer;
+import javax.imageio.ImageIO;
 
 public class ImageProcessor implements Runnable {
 
@@ -32,10 +34,12 @@ public class ImageProcessor implements Runnable {
     private int difCount = -1;
     private final Thread thread;
     public boolean run = true;
+    private String fileLoc = "";
 
     public ImageProcessor(ImageProducer in, String source, String destination) {
         input = in;
         logInput = new LogReader(source);
+        fileLoc = source;
         movingMatrix = logInput.getMovingMatrix();
         logOutput = new LogWriter(destination);
         thread = new Thread(this);
@@ -399,6 +403,15 @@ public class ImageProcessor implements Runnable {
         public SegmentationFailureException(String message) {
             super(message);
         }
+    }
+    
+    private void writeImage(byte[] raw, int cent0, int cent1, int index){
+        File dir = new File(fileLoc+"\\corp").mkdirs();
+        
+        for (int i = )
+        
+        BufferedImage = ImageTools.toBufferedImage(bb);      
+        ImageIO.write(bb,"jpeg", new File(dir.getAbsolutePath()+"\\"+String.format("%07d",index)+"CP.jpeg", referenceImage));
     }
 
     @Override

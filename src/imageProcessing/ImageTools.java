@@ -45,6 +45,13 @@ public class ImageTools {
         bytes.get(array);
         return img;
     }
+    
+    public static BufferedImage toBufferedImage(ByteBuffer bytes, int w, int h) {
+        BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_3BYTE_BGR);
+        byte[] array = ((DataBufferByte) img.getRaster().getDataBuffer()).getData();
+        bytes.get(array);
+        return img;
+    }
 
     public static BufferedImage toBufferedImage(ByteBuffer bytes, int type) {
         BufferedImage img = new BufferedImage(IMAGE_WIDTH, IMAGE_HEIGHT, type);
