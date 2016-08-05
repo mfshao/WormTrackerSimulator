@@ -1,5 +1,6 @@
 package imageProcessing;
 
+import static dto.Properties.IMAGE_EXTENSION;
 import imageAcquisition.ImageProducer;
 import imageProcessing.ImageTools.ImageEntry;
 import logRecording.LogWriter;
@@ -13,9 +14,14 @@ import static dto.Properties.SEGMENTATION_DELAY;
 import static dto.Properties.SEGMENTATION_FAILURE_THRESHOLD;
 import static dto.Properties.SEGMENTATION_THRESHOLD;
 import static dto.Properties.SEGMENTATION_WINDOW_SIZE;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
 public class ImageProcessor implements Runnable {
@@ -404,20 +410,52 @@ public class ImageProcessor implements Runnable {
             super(message);
         }
     }
-    
-    private void writeImage(byte[] raw, int cent0, int cent1, int index){
-        File dir = new File(fileLoc+"\\corp").mkdirs();
-        
-        for (int i = )
-        
-        BufferedImage = ImageTools.toBufferedImage(bb);      
-        ImageIO.write(bb,"jpeg", new File(dir.getAbsolutePath()+"\\"+String.format("%07d",index)+"CP.jpeg", referenceImage));
+
+    private void writeImage(byte[] raw, int cent0, int cent1, int index, String dir) {
+        int upper = cent1 - SEGMENTATION_WINDOW_SIZE;
+        if (upper < 0) {
+            upper = 0;
+        }
+        int lower = cent1 + SEGMENTATION_WINDOW_SIZE - 1;
+        if (lower > IMAGE_HEIGHT - 1) {
+            lower = IMAGE_HEIGHT - 1;
+        }
+        int left = cent0 - SEGMENTATION_WINDOW_SIZE;
+        if (left < 0) {
+            left = 0;
+        }
+        int right = cent0 + SEGMENTATION_WINDOW_SIZE - 1;
+        if (right > IMAGE_WIDTH - 1) {
+            right = IMAGE_WIDTH - 1;
+        }
+        System.out.println(upper + " " + lower + " " + left + " " + right);
+
+        byte[] crop = new byte[SEGMENTATION_WINDOW_SIZE * 2 * SEGMENTATION_WINDOW_SIZE * 2 * 3];
+        int byteIndex = 0;
+        for (int j = upper; j <= lower; j++) {
+            for (int i = left * 3; i <= right * 3; i += 3) {
+                crop[byteIndex] = raw[(j * IMAGE_WIDTH * 3) + i];
+                crop[byteIndex + 1] = raw[(j * IMAGE_WIDTH * 3) + i + 1];
+                crop[byteIndex + 2] = raw[(j * IMAGE_WIDTH * 3) + i + 2];
+                byteIndex += 3;
+            }
+        }
+        ByteBuffer bb = ByteBuffer.wrap(crop);
+        BufferedImage bimg = ImageTools.toBufferedImage(bb, SEGMENTATION_WINDOW_SIZE * 2, SEGMENTATION_WINDOW_SIZE * 2);
+        bb.clear();
+        try {
+            ImageIO.write(bimg, "jpeg", new File(dir + "\\" + String.format("%07d", index) + "CP" + IMAGE_EXTENSION));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     @Override
     public void run() {
         long lastSuccess = System.currentTimeMillis();
         int frame = 0;
+        String dirLoc = fileLoc + "\\corp";
+        new File(dirLoc).mkdirs();
         while (run) {
             try {
                 if (System.currentTimeMillis() - referenceTime > SEGMENTATION_DELAY) {
@@ -451,10 +489,11 @@ public class ImageProcessor implements Runnable {
                         }
                         referenceImage = seg;
                         referenceTime = System.currentTimeMillis();
-                        System.out.println("normal ref");
+//                        System.out.println("normal ref");
                         if (difCount == 0) {
-                            System.out.println("difCount zero");
+//                            System.out.println("difCount zero");
                             //entry = input.take();
+                            writeImage(wrap, (int) centroid[0], (int) centroid[1], frame, dirLoc);
                             logOutput.write(frame, entry.timeStamp, (int) centroid[0], (int) centroid[1], movingMatrix[frame]);
                             frame++;
                             continue;
@@ -462,14 +501,14 @@ public class ImageProcessor implements Runnable {
 
                         // If the image is too different... What happened?
                         if (difCount < 600) {
-                            System.out.println("difCount small");
+//                            System.out.println("difCount small");
                             try {
                                 prevCentroid = centroid;
                                 centroid = largestComponent(dif);
                                 isNew = true;
                                 lastSuccess = System.currentTimeMillis();
                             } catch (SegmentationFailureException e) {
-                                System.out.println("No components.");
+//                                System.out.println("No components.");
                             }
                         }
                         if (System.currentTimeMillis() - lastSuccess > SEGMENTATION_FAILURE_THRESHOLD) {
@@ -483,11 +522,12 @@ public class ImageProcessor implements Runnable {
                             break;
                         }
                     } else {
-                        System.out.println("null ref");
+//                        System.out.println("null ref");
                         referenceImage = seg;
                         referenceTime = System.currentTimeMillis();
                         //centroid = largestComponent(seg);
                     }
+                    writeImage(wrap, (int) centroid[0], (int) centroid[1], frame, dirLoc);
                     logOutput.write(frame, entry.timeStamp, (int) centroid[0], (int) centroid[1], movingMatrix[frame]);
                     frame++;
                 } else {
