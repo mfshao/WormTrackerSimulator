@@ -454,7 +454,7 @@ public class ImageProcessor implements Runnable {
     public void run() {
         long lastSuccess = System.currentTimeMillis();
         int frame = 0;
-        String dirLoc = fileLoc + "\\corp";
+        String dirLoc = fileLoc + "\\corp1";
         new File(dirLoc).mkdirs();
         while (run) {
             try {
