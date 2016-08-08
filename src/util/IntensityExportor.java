@@ -24,9 +24,12 @@ import javax.imageio.ImageIO;
  */
 public class IntensityExportor {
 
+    private static final int MAX_FILE_NUM = 580;
+
     private ByteBuffer img = null;
     private int imgWidth = 0;
     private int imgHeight = 0;
+    private static final String filePath = "E:\\testdata\\AIB_HR_nf2\\useful1";
 
     public IntensityExportor(ByteBuffer source, int w, int h) {
         if (source == null) {
@@ -46,7 +49,7 @@ public class IntensityExportor {
         }
     }
 
-    public void getIntensities() {
+    public void getIntensities(int index) {
         FileWriter fw = null;
         try {
             byte[] wrap;
@@ -55,7 +58,7 @@ public class IntensityExportor {
             img.rewind();
             int[] gray = ImageProcessor.getGray(wrap);
             ArrayList<String> vals = new ArrayList<>();
-            String csvFile = "D:\\Untitled.csv";
+            String csvFile = filePath + "\\" + String.format("%07d", index) + ".csv";
             fw = new FileWriter(csvFile);
             for (int i = 0; i < imgHeight; i++) {
                 vals.clear();
@@ -81,16 +84,17 @@ public class IntensityExportor {
     }
 
     public static void main(String[] args) {
-        String filePath = "D:\\Untitled.jpeg";
-        try {
-            byte[] imgBytes;
-            imgBytes = ((DataBufferByte) (ImageIO.read(new File(filePath)).getRaster().getDataBuffer())).getData();
+        for (int i = 500; i < MAX_FILE_NUM; i++) {
+            try {
+                byte[] imgBytes;
+                imgBytes = ((DataBufferByte) (ImageIO.read(new File(filePath + "\\" + String.format("%07d", i) + "CP" + IMAGE_EXTENSION)).getRaster().getDataBuffer())).getData();
 //            IntensityExportor iepr = new IntensityExportor(ByteBuffer.wrap(imgBytes), 1280, 960);
 //            IntensityExportor iepr = new IntensityExportor(ByteBuffer.wrap(imgBytes), 640, 480);
-            IntensityExportor iepr = new IntensityExportor(ByteBuffer.wrap(imgBytes), 34, 64);
-            iepr.getIntensities();;
-        } catch (IOException e) {
-            e.printStackTrace();
+                IntensityExportor iepr = new IntensityExportor(ByteBuffer.wrap(imgBytes), 400, 400);
+                iepr.getIntensities(i);;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
