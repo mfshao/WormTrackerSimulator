@@ -25,11 +25,14 @@ import javax.imageio.ImageIO;
 public class IntensityExportor {
 
     private static final int MAX_FILE_NUM = 580;
+    private static final String[] LR_IMAGE_STR = {"0000509CP_head100", "0000509CP_tail100", "0000539CP_head100", "0000539CP_tail100", "0000569CP_head100", "0000569CP_tail100", "0000509CP_head400", "0000509CP_tail400", "0000539CP_head400", "0000539CP_tail400", "0000569CP_head400", "0000569CP_tail400"};
+    private static final String[] HR_IMAGE_STR = {"0000509CP_head400", "0000509CP_tail400", "0000539CP_head400", "0000539CP_tail400", "0000569CP_head400", "0000569CP_tail400", "0000509CP_head1600", "0000509CP_tail1600", "0000539CP_head1600", "0000539CP_tail1600", "0000569CP_head1600", "0000569CP_tail1600"};
+    private static final String[] TYPE_STR = {"AIB_DS_nf2", "AIB_HR_nf2_L", "che2_DS_f8", "che2_HR_f8_L"};
 
     private ByteBuffer img = null;
     private int imgWidth = 0;
     private int imgHeight = 0;
-    private static final String filePath = "E:\\testdata\\AIB_HR_nf2\\useful1";
+    private static final String filePath = "F:\\testdata\\che2_HR_f8_L";
 
     public IntensityExportor(ByteBuffer source, int w, int h) {
         if (source == null) {
@@ -58,7 +61,8 @@ public class IntensityExportor {
             img.rewind();
             int[] gray = ImageProcessor.getGray(wrap);
             ArrayList<String> vals = new ArrayList<>();
-            String csvFile = filePath + "\\" + String.format("%07d", index) + ".csv";
+            String csvFile = filePath + "\\" + HR_IMAGE_STR[index] + ".csv";
+            System.out.println(HR_IMAGE_STR[index]);
             fw = new FileWriter(csvFile);
             for (int i = 0; i < imgHeight; i++) {
                 vals.clear();
@@ -84,16 +88,27 @@ public class IntensityExportor {
     }
 
     public static void main(String[] args) {
-        for (int i = 500; i < MAX_FILE_NUM; i++) {
+//        for (int i = 500; i < MAX_FILE_NUM; i++) {
+//            try {
+//                byte[] imgBytes;
+//                imgBytes = ((DataBufferByte) (ImageIO.read(new File(filePath + "\\" + String.format("%07d", i) + "CP" + IMAGE_EXTENSION)).getRaster().getDataBuffer())).getData();
+////            IntensityExportor iepr = new IntensityExportor(ByteBuffer.wrap(imgBytes), 1280, 960);
+////            IntensityExportor iepr = new IntensityExportor(ByteBuffer.wrap(imgBytes), 640, 480);
+//                IntensityExportor iepr = new IntensityExportor(ByteBuffer.wrap(imgBytes), 400, 400);
+//                iepr.getIntensities(i);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+        for (int i = 0; i < LR_IMAGE_STR.length; i++) {
             try {
                 byte[] imgBytes;
-                imgBytes = ((DataBufferByte) (ImageIO.read(new File(filePath + "\\" + String.format("%07d", i) + "CP" + IMAGE_EXTENSION)).getRaster().getDataBuffer())).getData();
-//            IntensityExportor iepr = new IntensityExportor(ByteBuffer.wrap(imgBytes), 1280, 960);
-//            IntensityExportor iepr = new IntensityExportor(ByteBuffer.wrap(imgBytes), 640, 480);
-                IntensityExportor iepr = new IntensityExportor(ByteBuffer.wrap(imgBytes), 400, 400);
-                iepr.getIntensities(i);;
-            } catch (IOException e) {
-                e.printStackTrace();
+                imgBytes = ((DataBufferByte) (ImageIO.read(new File(filePath + "\\" + HR_IMAGE_STR[i] + ".jpg")).getRaster().getDataBuffer())).getData();
+                int size = (int) Math.sqrt(Double.parseDouble(HR_IMAGE_STR[i].substring(14)));
+                IntensityExportor iepr = new IntensityExportor(ByteBuffer.wrap(imgBytes), size, size);
+                iepr.getIntensities(i);
+            } catch (IOException ex) {
+                ex.printStackTrace();
             }
         }
     }
