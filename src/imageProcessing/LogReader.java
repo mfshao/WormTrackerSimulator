@@ -25,6 +25,9 @@ public class LogReader {
 
     public LogReader(String source) {
         inputDirectory = source;
+    }
+
+    public void open() {
         try {
             is = new DataInputStream(new FileInputStream(new File(inputDirectory + "\\log.dat")));
 //            GUI.getController().updateStatusBox(source);
@@ -45,6 +48,7 @@ public class LogReader {
     }
 
     public int[] getMovingMatrix() {
+        open();
         int[] movingMatrix = new int[dto.Properties.imagecount];
         try {
             int i = 0;
@@ -60,5 +64,24 @@ public class LogReader {
             ex.printStackTrace();
         }
         return movingMatrix;
+    }
+
+    public long[] getTimeMatrix() {
+        open();
+        long[] timeMatrix = new long[dto.Properties.imagecount];
+        try {
+            int i = 0;
+            while ((is.available() > 0) && (i < dto.Properties.imagecount)) {
+                is.readInt();//frame
+                timeMatrix[i++] = is.readLong();//timeStamp
+                is.readInt();//x
+                is.readInt();//y
+                is.readInt();
+            }
+            close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return timeMatrix;
     }
 }

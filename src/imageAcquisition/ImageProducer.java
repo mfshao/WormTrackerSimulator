@@ -37,13 +37,13 @@ public class ImageProducer implements Runnable {
     @Override
     public void run() {
         while (run) {
-            if (input.isReady()&&buffer.size() < IMAGE_BUFFER_SIZE) {
+            if (input.isReady() && buffer.size() < IMAGE_BUFFER_SIZE) {
                 buffer.add(new ImageEntry(input.getImage()));
                 input.updateSeek();
 //                if (buffer.size() > IMAGE_BUFFER_SIZE) {
 //                    poll(); //Too many in buffer... Throw frames away.
 //                }
-            }else{
+            } else {
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException ex) {

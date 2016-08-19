@@ -227,10 +227,10 @@ public class MotorControlSimulator implements Runnable {
             if (!imageProcessor.run) {
                 break;
             }
-            if (System.currentTimeMillis() - lastMove > SEGMENTATION_FAILURE_THRESHOLD) {
-                imageProcessor.run = false;
-                break;
-            }
+//            if (System.currentTimeMillis() - lastMove > SEGMENTATION_FAILURE_THRESHOLD) {
+//                imageProcessor.run = false;
+//                break;
+//            }
             try {
                 Thread.sleep(MOTOR_TICK_RATE);
             } catch (Exception e) {
