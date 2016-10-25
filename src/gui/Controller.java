@@ -251,11 +251,11 @@ public class Controller extends VBox {
                         break;
                 }
 
-                dto.Properties.SEGMENTATION_WINDOW_SIZE = (int) Math.ceil((double) (dto.Properties.SEGMENTATION_WINDOW_SIZE * dto.Properties.IMAGE_HEIGHT * dto.Properties.IMAGE_WIDTH) / (640 * 480));
+                dto.Properties.SEGMENTATION_WINDOW_SIZE = (int) Math.ceil((double) (dto.Properties.SEGMENTATION_WINDOW_SIZE * dto.Properties.IMAGE_WIDTH) / 640);
                 dto.Properties.SEGMENTATION_COMPONENT_MIN_SIZE = (int) Math.ceil((double) (dto.Properties.SEGMENTATION_COMPONENT_MIN_SIZE * dto.Properties.IMAGE_HEIGHT * dto.Properties.IMAGE_WIDTH) / (640 * 480));
                 dto.Properties.MOTOR_PX_PER_STEP_X = (double) (dto.Properties.IMAGE_WIDTH * dto.Properties.MOTOR_PX_PER_STEP_X) / 640;
                 dto.Properties.MOTOR_PX_PER_STEP_Y = (double) (dto.Properties.IMAGE_HEIGHT * dto.Properties.MOTOR_PX_PER_STEP_Y) / 480;
-                dto.Properties.MOVE_DECISION_CONFIDENCE_DISTANCE = (double) (dto.Properties.IMAGE_HEIGHT * dto.Properties.IMAGE_WIDTH * dto.Properties.MOVE_DECISION_CONFIDENCE_DISTANCE) / (640 * 480);
+                dto.Properties.MOVE_DECISION_CONFIDENCE_DISTANCE = (double) (dto.Properties.IMAGE_WIDTH * dto.Properties.MOVE_DECISION_CONFIDENCE_DISTANCE) / 640;
                 dto.Properties.MOVE_DECISION_BOUNDARY_PX = (int) (dto.Properties.IMAGE_WIDTH * dto.Properties.MOVE_DECISION_BOUNDARY_RATIO);
             } catch (NullPointerException e) {
                 showExceptionError(e, "NullPointerException", "Please select a resolution first!");

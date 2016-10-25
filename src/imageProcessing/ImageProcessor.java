@@ -223,7 +223,7 @@ public class ImageProcessor implements Runnable {
         if (entry == null) {
             return;
         }
-        System.out.println("new ref");
+//        System.out.println("new ref");
         byte[] wrap;
         synchronized (entry) {
             ByteBuffer img = entry.img;
@@ -397,9 +397,12 @@ public class ImageProcessor implements Runnable {
                     if (id[j + (i * w)] == largestId) {
                         avgx += j;
                         avgy += i;
+                        System.out.println("j " + j + ", i " + i);
                     }
                 }
             }
+            System.out.println("avgx " + avgx + ", avgy " + avgy + ", largest " + largest);
+            System.out.println();
             return new double[]{((double) avgx / (double) largest),
                 ((double) avgy / (double) largest)};
         }
@@ -451,7 +454,6 @@ public class ImageProcessor implements Runnable {
 //            ex.printStackTrace();
 //        }
 //    }
-
     @Override
     public void run() {
         long lastSuccess = System.currentTimeMillis();
@@ -491,9 +493,9 @@ public class ImageProcessor implements Runnable {
                         }
                         referenceImage = seg;
                         referenceTime = System.currentTimeMillis();
-                        System.out.println("normal ref");
+//                        System.out.println("normal ref");
                         if (difCount == 0) {
-                            System.out.println("difCount zero");
+//                            System.out.println("difCount zero");
                             //entry = input.take();
 //                            writeImage(wrap, (int) centroid[0], (int) centroid[1], frame, dirLoc);
                             logOutput.write(frame, timeMatrix[frame], (int) centroid[0], (int) centroid[1], movingMatrix[frame]);
@@ -503,14 +505,14 @@ public class ImageProcessor implements Runnable {
 
                         // If the image is too different... What happened?
                         if (difCount < 600) {
-                            System.out.println("difCount small");
+//                            System.out.println("difCount small");
                             try {
                                 prevCentroid = centroid;
                                 centroid = largestComponent(dif);
                                 isNew = true;
                                 lastSuccess = System.currentTimeMillis();
                             } catch (SegmentationFailureException e) {
-                                System.out.println("No components.");
+//                                System.out.println("No components.");
                             }
                         }
 //                        if (System.currentTimeMillis() - lastSuccess > SEGMENTATION_FAILURE_THRESHOLD) {
@@ -525,7 +527,7 @@ public class ImageProcessor implements Runnable {
 //                            break;
 //                        }
                     } else {
-                        System.out.println("null ref");
+//                        System.out.println("null ref");
                         referenceImage = seg;
                         referenceTime = System.currentTimeMillis();
                         //centroid = largestComponent(seg);
