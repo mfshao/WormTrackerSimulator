@@ -458,11 +458,22 @@ public class ImageProcessor implements Runnable {
     public void run() {
         long lastSuccess = System.currentTimeMillis();
         int frame = 0;
+        int isMoving = 0;
 //        String dirLoc = fileLoc + "\\corp1";
 //        new File(dirLoc).mkdirs();
         while (run) {
             try {
                 if (System.currentTimeMillis() - referenceTime > SEGMENTATION_DELAY) {
+                    if (centroid[0] <= MOVE_DECISION_BOUNDARY_PX
+                            || centroid[0] >= IMAGE_WIDTH - MOVE_DECISION_BOUNDARY_PX
+                            || centroid[1] <= MOVE_DECISION_BOUNDARY_PX
+                            || centroid[1] >= IMAGE_HEIGHT - MOVE_DECISION_BOUNDARY_PX) {
+                        if (isConfident()) {
+                            isMoving = 1;
+                        }
+                    } else {
+                        isMoving = 0;
+                    }
                     ImageEntry entry = input.poll();
 
                     if (entry == null) {
@@ -499,6 +510,7 @@ public class ImageProcessor implements Runnable {
                             //entry = input.take();
 //                            writeImage(wrap, (int) centroid[0], (int) centroid[1], frame, dirLoc);
                             logOutput.write(frame, timeMatrix[frame], (int) centroid[0], (int) centroid[1], movingMatrix[frame]);
+//                            logOutput.write(frame, timeMatrix[frame], (int) centroid[0], (int) centroid[1], isMoving);
                             frame++;
                             continue;
                         }
@@ -533,7 +545,8 @@ public class ImageProcessor implements Runnable {
                         //centroid = largestComponent(seg);
                     }
 //                    writeImage(wrap, (int) centroid[0], (int) centroid[1], frame, dirLoc);
-                    logOutput.write(frame, timeMatrix[frame], (int) centroid[0], (int) centroid[1], movingMatrix[frame]);
+//                    logOutput.write(frame, timeMatrix[frame], (int) centroid[0], (int) centroid[1], movingMatrix[frame]);
+                    logOutput.write(frame, timeMatrix[frame], (int) centroid[0], (int) centroid[1], isMoving);
                     frame++;
                 } else {
                     Thread.sleep(10);
