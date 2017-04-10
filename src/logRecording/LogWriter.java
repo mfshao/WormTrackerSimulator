@@ -56,14 +56,15 @@ public class LogWriter {
         }
     }
 
-    public void write(int frame, long timeStamp, int x, int y, int moving) {
+    public void write(int frame, long timeStamp, int x, int y, int moving, int size) {
         try {
-            fw.write(String.format("%07d %d %d %d %d%n", frame, timeStamp, x, y, moving));
+            fw.write(String.format("%07d %d %d %d %d %d%n", frame, timeStamp, x, y, moving, size));
             os.writeInt(frame);
             os.writeLong(timeStamp);
             os.writeInt(x);
             os.writeInt(y);
             os.writeInt(moving);
+            os.writeInt(size);
             if (frame % 30 == 0) {
                 System.out.println("flush!");
                 os.flush();

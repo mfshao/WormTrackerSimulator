@@ -1,6 +1,5 @@
 package imageProcessing;
 
-import static dto.Properties.IMAGE_EXTENSION;
 import imageAcquisition.ImageProducer;
 import imageProcessing.ImageTools.ImageEntry;
 import logRecording.LogWriter;
@@ -11,18 +10,10 @@ import static dto.Properties.MOVE_DECISION_BOUNDARY_PX;
 import static dto.Properties.MOVE_DECISION_CONFIDENCE_DISTANCE;
 import static dto.Properties.SEGMENTATION_COMPONENT_MIN_SIZE;
 import static dto.Properties.SEGMENTATION_DELAY;
-import static dto.Properties.SEGMENTATION_FAILURE_THRESHOLD;
 import static dto.Properties.SEGMENTATION_THRESHOLD;
 import static dto.Properties.SEGMENTATION_WINDOW_SIZE;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
 import java.nio.ByteBuffer;
-import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.imageio.ImageIO;
 
 public class ImageProcessor implements Runnable {
 
@@ -42,6 +33,7 @@ public class ImageProcessor implements Runnable {
     private final Thread thread;
     public boolean run = true;
     private String fileLoc = "";
+    private static Component cmp;
 
     public ImageProcessor(ImageProducer in, String source, String destination) {
         input = in;
@@ -244,7 +236,7 @@ public class ImageProcessor implements Runnable {
      */
     private static double[] largestComponent(boolean[][] image)
             throws SegmentationFailureException {
-        Component cmp = new Component(image);
+        cmp = new Component(image);
         // cmp.count();
         int w = image.length;
         int h = image[0].length;
@@ -315,6 +307,7 @@ public class ImageProcessor implements Runnable {
         private int count;
         private final int w;
         private final int h;
+        private int largest;
 
         public Component(boolean[][] image) throws SegmentationFailureException {
             w = image.length;
@@ -365,6 +358,10 @@ public class ImageProcessor implements Runnable {
             count--;
         }
 
+        public int getLargestSize() {
+            return largest;
+        }
+
         public double[] largestComponentCentroid()
                 throws SegmentationFailureException {
             if (count == 0) {
@@ -372,7 +369,7 @@ public class ImageProcessor implements Runnable {
                 throw new SegmentationFailureException("No components found!");
             }
             int largestId = -1;
-            int largest = 0;
+            largest = 0;
             for (int i = 0; i < h; i++) {
                 for (int j = 0; j < w; j++) {
                     int compId = id[j + (i * w)];
@@ -459,6 +456,7 @@ public class ImageProcessor implements Runnable {
         long lastSuccess = System.currentTimeMillis();
         int frame = 0;
         int isMoving = 0;
+        int largestSize = 0;
 //        String dirLoc = fileLoc + "\\corp1";
 //        new File(dirLoc).mkdirs();
         while (run) {
@@ -506,10 +504,15 @@ public class ImageProcessor implements Runnable {
                         referenceTime = System.currentTimeMillis();
 //                        System.out.println("normal ref");
                         if (difCount == 0) {
+                            if (cmp != null) {
+                                largestSize = cmp.getLargestSize();
+                            } else {
+                                largestSize = 0;
+                            }
 //                            System.out.println("difCount zero");
                             //entry = input.take();
 //                            writeImage(wrap, (int) centroid[0], (int) centroid[1], frame, dirLoc);
-                            logOutput.write(frame, timeMatrix[frame], (int) centroid[0], (int) centroid[1], movingMatrix[frame]);
+                            logOutput.write(frame, timeMatrix[frame], (int) centroid[0], (int) centroid[1], movingMatrix[frame], cmp.largest);
 //                            logOutput.write(frame, timeMatrix[frame], (int) centroid[0], (int) centroid[1], isMoving);
                             frame++;
                             continue;
@@ -544,9 +547,14 @@ public class ImageProcessor implements Runnable {
                         referenceTime = System.currentTimeMillis();
                         //centroid = largestComponent(seg);
                     }
+                    if (cmp != null) {
+                        largestSize = cmp.getLargestSize();
+                    } else {
+                        largestSize = 0;
+                    }
 //                    writeImage(wrap, (int) centroid[0], (int) centroid[1], frame, dirLoc);
 //                    logOutput.write(frame, timeMatrix[frame], (int) centroid[0], (int) centroid[1], movingMatrix[frame]);
-                    logOutput.write(frame, timeMatrix[frame], (int) centroid[0], (int) centroid[1], isMoving);
+                    logOutput.write(frame, timeMatrix[frame], (int) centroid[0], (int) centroid[1], isMoving, largestSize);
                     frame++;
                 } else {
                     Thread.sleep(10);
